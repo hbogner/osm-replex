@@ -3,7 +3,7 @@
 
 rm -rf bin/osmosis
 mkdir bin/osmosis
-wget http://bretth.dev.openstreetmap.org/osmosis-build/osmosis-latest.zip -O bin/osmosis.zip
+wget https://github.com/openstreetmap/osmosis/releases/download/0.48.2/osmosis-0.48.2.zip -O bin/osmosis.zip
 unzip bin/osmosis.zip -d bin/osmosis/
 rm bin/osmosis.zip
 
