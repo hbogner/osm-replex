@@ -66,7 +66,7 @@ statistike=$STATS/statistike.htm
 ####
 ####echo "===== Replication S T A R T ====="  >> $LOG
 ####echo `date +%Y-%m-%d\ %H:%M:%S`" - Starting script" >> $LOG
-####start_time0=`date +%s`
+start_time0=`date +%s`
 ####
 #####print date from state.txt to log
 ####awk '{if (NR!=1) {print}}' $REPLEX/state.txt >> $LOG
@@ -169,25 +169,31 @@ NEWSECOND=${NEWTIMESTAMP:19:2}
 #end_time=`date +%s`
 #lasted="$(( $end_time - $start_time ))"
 #echo `date +%Y-%m-%d\ %H:%M:%S`" - Backup finished in" $lasted "seconds." >> $LOG
-#
+
+
+
 #####################
 ## osm.pbf exporti ##
 #####################
 
 echo `date +%Y-%m-%d\ %H:%M:%S`" - PBF export starting." >> $LOG
 
-#izvlaci drzavu iz europe ########################
-for drzava in albania bosnia-herzegovina bulgaria croatia hungary kosovo northmacedonia montenegro romania serbia slovenia 
+## Extracts countfy from europe##
+
+for COUNTRY in albania #bosnia-herzegovina bulgaria croatia hungary kosovo northmacedonia montenegro romania serbia slovenia 
 do
-  echo `date +%Y-%m-%d\ %H:%M:%S`" - "$drzava" export started" >> $LOG
+  echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" export started" >> $LOG
   start_time=`date +%s`
-  $osmosis --read-pbf file="$EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf" --bounding-polygon clipIncompleteEntities="true" file="$POLY/$drzava.poly" --write-pbf   file="$DATA/$drzava.osm.pbf"
-  cp -p $DATA/$drzava.osm.pbf $PBF/$drzava.osm.pbf
-  cp -p $PBF/$drzava.osm.pbf $WEB/$drzava/archive/$NEWYEAR$NEWMONTH$NEWDAY-$drzava.osm.pbf
-  touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $WEB/$drzava/archive/$NEWYEAR$NEWMONTH$NEWDAY-$drzava.osm.pbf
+  $osmosis --read-pbf file="$EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf" --bounding-polygon clipIncompleteEntities="true" file="$POLY/$COUNTRY.poly" --write-pbf file="$DATA/$COUNTRY.osm.pbf"
+  cp -p $DATA/$COUNTRY.osm.pbf $PBF/$COUNTRY.osm.pbf
+  if [[ ! -d $WEB/$COUNTRY/archive/$NEWYEAR/ ]]; then
+  mkdir $WEB/$COUNTRY/archive/$NEWYEAR/
+  fi
+  cp -p $PBF/$COUNTRY.osm.pbf $WEB/$COUNTRY/archive/$NEWYEAR/$NEWYEAR$NEWMONTH$NEWDAY-$COUNTRY.osm.pbf
+  touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $WEB/$COUNTRY/archive/$NEWYEAR/$NEWYEAR$NEWMONTH$NEWDAY-$COUNTRY.osm.pbf
   end_time=`date +%s`
   lasted="$(( $end_time - $start_time ))"
-  echo `date +%Y-%m-%d\ %H:%M:%S`" - "$drzava" PBF export finished in" $lasted "seconds." >> $LOG
+  echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" PBF export finished in" $lasted "seconds." >> $LOG
 done
 
 echo `date +%Y-%m-%d\ %H:%M:%S`" - PBF export finished." >> $LOG
@@ -206,11 +212,11 @@ echo `date +%Y-%m-%d\ %H:%M:%S`" - PBF export finished." >> $LOG
 #  echo `date +%Y-%m-%d\ %H:%M:%S`" - Croatia diff finished in" $lasted "seconds." >> $LOG
 #  if [ $dayom01 -eq 01 ]
 #   then
-#   for drzava in albania bosnia-herzegovina bulgaria hungary kosovo northmacedonia montenegro romania serbia slovenia
+#   for COUNTRY in albania bosnia-herzegovina bulgaria hungary kosovo northmacedonia montenegro romania serbia slovenia
 #    do
-#      #copy drzava monthly backup
-#      cp -p $PBF/$drzava.osm.pbf $WEB/$drzava/archive/$yesterday-$drzava.osm.pbf
-#      echo `date +%Y-%m-%d\ %H:%M:%S`" - "$drzava" monthly archive created." >> $LOG
+#      #copy COUNTRY monthly backup
+#      cp -p $PBF/$COUNTRY.osm.pbf $WEB/$COUNTRY/archive/$yesterday-$COUNTRY.osm.pbf
+#      echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" monthly archive created." >> $LOG
 #    done
 #  fi
 #fi
@@ -221,16 +227,16 @@ echo `date +%Y-%m-%d\ %H:%M:%S`" - PBF export finished." >> $LOG
 #
 #echo `date +%Y-%m-%d\ %H:%M:%S`" - GPKG export starting." >> $LOG
 #
-#for drzava in albania bosnia-herzegovina bulgaria croatia hungary kosovo northmacedonia montenegro romania serbia slovenia 
+#for COUNTRY in albania bosnia-herzegovina bulgaria croatia hungary kosovo northmacedonia montenegro romania serbia slovenia 
 #do
-#  echo `date +%Y-%m-%d\ %H:%M:%S`" - "$drzava" GPKG export started" >> $LOG
+#  echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" GPKG export started" >> $LOG
 #  start_time=`date +%s`
-#  $OGR2OGR -f GPKG $CACHE/$drzava.gpkg $DATA/$drzava.osm.pbf
-#  zip -m -j $CACHE/$drzava.gpkg.zip $CACHE/$drzava.gpkg
-#  mv $CACHE/$drzava.gpkg.zip $GIS/
+#  $OGR2OGR -f GPKG $CACHE/$COUNTRY.gpkg $DATA/$COUNTRY.osm.pbf
+#  zip -m -j $CACHE/$COUNTRY.gpkg.zip $CACHE/$COUNTRY.gpkg
+#  mv $CACHE/$COUNTRY.gpkg.zip $GIS/
 #  end_time=`date +%s`
 #  lasted="$(( $end_time - $start_time ))"
-#  echo `date +%Y-%m-%d\ %H:%M:%S`" - "$drzava" GPKG export finished in" $lasted "seconds." >> $LOG
+#  echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" GPKG export finished in" $lasted "seconds." >> $LOG
 #done
 #
 #echo `date +%Y-%m-%d\ %H:%M:%S`" - GPKG export finished." >> $LOG
@@ -246,29 +252,29 @@ echo `date +%Y-%m-%d\ %H:%M:%S`" - PBF export finished." >> $LOG
 #  then
 #  echo `date +%Y-%m-%d\ %H:%M:%S`" - Garmin export starting." >> $LOG
 #  mapid=90000001
-#  for drzava in europe-east albania bosnia-herzegovina bulgaria croatia hungary kosovo northmacedonia montenegro romania serbia slovenia
+#  for COUNTRY in europe-east albania bosnia-herzegovina bulgaria croatia hungary kosovo northmacedonia montenegro romania serbia slovenia
 #  do
-#    echo `date +%Y-%m-%d\ %H:%M:%S`" - "$drzava" garmin export started" >> $LOG
+#    echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" garmin export started" >> $LOG
 #    start_time=`date +%s`
 #    rm $CACHE/*
-#    java -Xmx$RAM -jar $SPLITTER --output-dir=$CACHE --mapid=$mapid --cache=$CACHE $DATA/$drzava.osm.pbf 
-#    java -Xmx$RAM -jar $MKGMAP --output-dir=$CACHE --index --gmapsupp --series-name="OSM $drzava - d1" --family-name="OSM $drzava" --country-name="$drzava" --remove-short-arcs --net --route --generate-sea:no-sea-sectors,extend-sea-sectors $CACHE/90*.osm.pbf
-#    mv $CACHE/gmapsupp.img $WEB/garmin/$drzava-gmapsupp.img
-#    zip -j $DATA/$drzava-garmin.zip $CACHE/*90*.img $CACHE/osmmap.*
-#    mv $DATA/$drzava-garmin.zip $WEB/garmin/$drzava-garmin.zip
+#    java -Xmx$RAM -jar $SPLITTER --output-dir=$CACHE --mapid=$mapid --cache=$CACHE $DATA/$COUNTRY.osm.pbf 
+#    java -Xmx$RAM -jar $MKGMAP --output-dir=$CACHE --index --gmapsupp --series-name="OSM $COUNTRY - d1" --family-name="OSM $COUNTRY" --country-name="$COUNTRY" --remove-short-arcs --net --route --generate-sea:no-sea-sectors,extend-sea-sectors $CACHE/90*.osm.pbf
+#    mv $CACHE/gmapsupp.img $WEB/garmin/$COUNTRY-gmapsupp.img
+#    zip -j $DATA/$COUNTRY-garmin.zip $CACHE/*90*.img $CACHE/osmmap.*
+#    mv $DATA/$COUNTRY-garmin.zip $WEB/garmin/$COUNTRY-garmin.zip
 #    mapid=$(($mapid + 10000))
 #    end_time=`date +%s`
 #    lasted="$(( $end_time - $start_time ))"
-#    echo `date +%Y-%m-%d\ %H:%M:%S`" - "$drzava" Garmin export finished in" $lasted "seconds." >> $LOG
+#    echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" Garmin export finished in" $lasted "seconds." >> $LOG
 #  done
 #
 #  ##spajanje topo i gmapsupp
 #  rm $CACHE/*
-#  java -Xmx$RAM -jar $MKGMAP --output-dir=$CACHE --gmapsupp $WEB/garmin/$drzava-gmapsupp.img $WEB/garmin/croatia-topo25m.img
+#  java -Xmx$RAM -jar $MKGMAP --output-dir=$CACHE --gmapsupp $WEB/garmin/$COUNTRY-gmapsupp.img $WEB/garmin/croatia-topo25m.img
 #  mv $CACHE/gmapsupp.img $WEB/garmin/croatia-topo25m-gmapsupp.img
 #  echo `date +%Y-%m-%d\ %H:%M:%S`" - Croatia topo25 finished." >> $LOG
 #  rm $CACHE/*
-#  java -Xmx$RAM -jar $MKGMAP --output-dir=$CACHE --gmapsupp $WEB/garmin/$drzava-gmapsupp.img $WEB/garmin/croatia-topo10m.img
+#  java -Xmx$RAM -jar $MKGMAP --output-dir=$CACHE --gmapsupp $WEB/garmin/$COUNTRY-gmapsupp.img $WEB/garmin/croatia-topo10m.img
 #  mv $CACHE/gmapsupp.img $WEB/garmin/croatia-topo10m-gmapsupp.img
 #  echo `date +%Y-%m-%d\ %H:%M:%S`" - Croatia topo10 finished." >> $LOG
 #
@@ -301,107 +307,82 @@ echo `date +%Y-%m-%d\ %H:%M:%S`" - PBF export finished." >> $LOG
 #fi
 #
 #rm $CACHE/*
-#
-############################
-## Statistike za hrvatsku ##
-############################
 
-#uvjet da se izvršava samo u ponoć
-#if [ $hour -eq 00 ]
-#  then
-  echo `date +%Y-%m-%d\ %H:%M:%S`" - Croatia statistics starting." >> $LOG
 
-  start_time=`date +%s`
-  for drzava in croatia
-  do
-    $osmconvert --out-statistics $PBF/$drzava.osm.pbf > $STATS/$drzava-stats.txt
-    TOTAL_NODE=`cat $STATS/$drzava-stats.txt | grep nodes | awk -F ' ' '{print $2}'`
-    TOTAL_WAY=`cat $STATS/$drzava-stats.txt | grep ways | awk -F ' ' '{print $2}'`
-    TOTAL_RELATION=`cat $STATS/$drzava-stats.txt | grep relations | awk -F ' ' '{print $2}'`
-    #country total stats
-    echo $NEWYEAR$NEWMONTH$NEWDAY','$TOTAL_NODE','$TOTAL_WAY','$TOTAL_RELATION >> $WEB/$drzava/stats/$drzava-total.txt
-    #next 2lines to be replaced with symlink on server
-    cp -p $WEB/$drzava/stats/$drzava-total.txt $WEB/$drzava/$drzava-total.txt
-    cp -p $WEB/$drzava/stats/$drzava-total.txt $WEB/statistics/$drzava-total.txt
-    cp -p $WEB/$drzava/stats/$drzava-total.txt $WEB/statistics/$drzava-monthly.txt
+######################
+## Daily statistics ##
+######################
 
-#STATS=$WEB/$drzava/stats/$drzava-total.txt
+for COUNTRY in albania #bosnia-herzegovina bulgaria croatia hungary kosovo northmacedonia montenegro romania serbia slovenia
+do
+  if [[ ! -f $WEB/$COUNTRY/stats/$COUNTRY-monthly.txt ]]; then
+  echo "Date,Nodes,Ways,Relations" >> $WEB/$COUNTRY/stats/$COUNTRY-monthly.txt
+  fi
+  if [ $NEWDAY -eq 01 ]; then 
+    tail -n 1$WEB/$COUNTRY/stats/$COUNTRY-daily.txt >> $WEB/$COUNTRY/stats/$COUNTRY-monthly.txt
+  fi
+  $osmconvert --out-statistics $PBF/$COUNTRY.osm.pbf > $STATS/$COUNTRY-stats.txt
+  TOTAL_NODE=`cat $STATS/$COUNTRY-stats.txt | grep nodes | awk -F ' ' '{print $2}'`
+  TOTAL_WAY=`cat $STATS/$COUNTRY-stats.txt | grep ways | awk -F ' ' '{print $2}'`
+  TOTAL_RELATION=`cat $STATS/$COUNTRY-stats.txt | grep relations | awk -F ' ' '{print $2}'`
+  #country total stats
+  #check if statitstics exist and create it if not
+  if [[ ! -f $WEB/$COUNTRY/stats/$COUNTRY-daily.txt ]]; then
+  echo "Date,Nodes,Ways,Relations" >> $WEB/$COUNTRY/stats/$COUNTRY-daily.txt
+  fi
+  echo $NEWYEAR$NEWMONTH$NEWDAY','$TOTAL_NODE','$TOTAL_WAY','$TOTAL_RELATION >> $WEB/$COUNTRY/stats/$COUNTRY-daily.txt
+  #next 2lines to be replaced with symlink on server
+  #cp -p $WEB/$COUNTRY/stats/$COUNTRY-total.txt $WEB/$COUNTRY/$COUNTRY-total.txt
+  #cp -p $WEB/$COUNTRY/stats/$COUNTRY-total.txt $WEB/statistics/$COUNTRY-total.txt
+echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" csv files created and copied to web." >> $LOG
 
-gnuplot << EOF
-set datafile separator ","
-set key autotitle columnhead
-set terminal png
-set output "$WEB/$drzava/stats/daily.png"
-set xlabel "Date"
-#set ylabel "Values"
-set title "Nodes"
-#set xrange [ 0 : 20 ]
-#set yrange [ 0 : 2 ]
-#set mxtics 5
-#set mytics 5
-set format y '%.0f'
-set xtics rotate
-set xdata time
-set timefmt "%Y%m%d"
-set xtics format "%Y-%m-%d"
-#set xtics 5
-#set ytics 0.5
-#plot "$STATS" using 1:2 w l, "$STATS" using 1:3 w l, "$STATS" using 1:4 w l, "$STATS" using 1:5 w l
-plot "$WEB/$drzava/stats/$drzava-total.txt" using 1:2 w l
+######################
+## Plot daily stats ##
+######################
 
-EOF
-
-    echo `date +%Y-%m-%d\ %H:%M:%S`" - "$drzava" csv files created and copied to web." >> $LOG
-  done
-
-  ##statistike i za ostale drzave
-  ##############################################################
- # if [ $dayom01 -eq 01 ]
- # then
-    for drzava in albania bosnia-herzegovina bulgaria hungary kosovo northmacedonia montenegro romania serbia slovenia
-    do
-      $osmconvert --out-statistics $PBF/$drzava.osm.pbf > $STATS/$drzava-stats.txt
-      TOTAL_NODE=`cat $STATS/$drzava-stats.txt | grep nodes | awk -F ' ' '{print $2}'`
-      TOTAL_WAY=`cat $STATS/$drzava-stats.txt | grep ways | awk -F ' ' '{print $2}'`
-      TOTAL_RELATION=`cat $STATS/$drzava-stats.txt | grep relations | awk -F ' ' '{print $2}'`
-      #country total stats
-      echo $NEWYEAR$NEWMONTH$NEWDAY','$TOTAL_NODE','$TOTAL_WAY','$TOTAL_RELATION >> $WEB/$drzava/stats/$drzava-total.txt
-      #next 2lines to be replaced with symlink on server
-      cp -p $WEB/$drzava/stats/$drzava-total.txt $WEB/$drzava/$drzava-total.txt
-      cp -p $WEB/$drzava/stats/$drzava-total.txt $WEB/statistics/$drzava-total.txt
-    echo `date +%Y-%m-%d\ %H:%M:%S`" - "$drzava" csv files created and copied to web." >> $LOG
-
-gnuplot << EOF
-set datafile separator ","
-set key autotitle columnhead
-set terminal png
-set output "$WEB/$drzava/stats/daily.png"
-set xlabel "Date"
-#set ylabel "Values"
-set title "Nodes"
-#set xrange [ 0 : 20 ]
-#set yrange [ 0 : 2 ]
-#set mxtics 5
-#set mytics 5
-set format y '%.0f'
-set xtics rotate
-set xdata time
-set timefmt "%Y%m%d"
-set xtics format "%Y-%m-%d"
-#set xtics 5
-#set ytics 0.5
-#plot "$STATS" using 1:2 w l, "$STATS" using 1:3 w l, "$STATS" using 1:4 w l, "$STATS" using 1:5 w l
-plot "$WEB/$drzava/stats/$drzava-total.txt" using 1:2 w l
-
-EOF
-
-    echo `date +%Y-%m-%d\ %H:%M:%S`" - "$drzava" gnuplot done." >> $LOG
-
-    done
-
-#  fi
-  echo `date +%Y-%m-%d\ %H:%M:%S`" - All statistics finished." >> $LOG
+#for TYPE in Nodes Ways Relations
+#do
+#if [ $TYPE -eq Nodes ]
+#then
+#PLOT= $(plot "$WEB/$COUNTRY/stats/$COUNTRY-daily.txt" using 1:2 w l)
+#elif [ $TYPE -eq Ways ]
+#then
+#PLOT= $(plot "$WEB/$COUNTRY/stats/$COUNTRY-daily.txt" using 1:3 w l)
+#else
+#PLOT= $(plot "$WEB/$COUNTRY/stats/$COUNTRY-daily.txt" using 1:4 w l)
 #fi
+#echo $PLOT
+
+gnuplot << EOF
+set datafile separator ","
+set key autotitle columnhead
+set terminal png
+set output "$WEB/$COUNTRY/stats/daily-nodes.png"
+set xlabel "Date"
+#set ylabel "Values"
+set title "Nodes"
+#set xrange [ 0 : 20 ]
+#set yrange [ 0 : 2 ]
+#set mxtics 5
+#set mytics 5
+set format y '%.0f'
+set xtics rotate
+set xdata time
+set timefmt "%Y%m%d"
+set xtics format "%Y-%m-%d"
+#set xtics 5
+#set ytics 0.5
+#plot "$STATS" using 1:2 w l, "$STATS" using 1:3 w l, "$STATS" using 1:4 w l, "$STATS" using 1:5 w l
+plot "$WEB/$COUNTRY/stats/$COUNTRY-daily.txt" using 1:2 w l
+EOF
+
+#done
+
+echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" gnuplot done." >> $LOG
+
+done
+
+echo `date +%Y-%m-%d\ %H:%M:%S`" - All statistics finished." >> $LOG
 
 chmod -R 755 $WEB
 
