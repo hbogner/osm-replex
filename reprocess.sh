@@ -335,6 +335,7 @@ do
   #cp -p $WEB/$COUNTRY/stats/$COUNTRY-total.txt $WEB/$COUNTRY/$COUNTRY-total.txt
   #cp -p $WEB/$COUNTRY/stats/$COUNTRY-total.txt $WEB/statistics/$COUNTRY-total.txt
 echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" csv files created and copied to web." >> $LOG
+done
 
 ######################
 ## Plot daily stats ##
@@ -382,20 +383,12 @@ set key autotitle columnhead
 set terminal png
 set output "$WEB/$COUNTRY/stats/daily-ways.png"
 set xlabel "Date"
-#set ylabel "Values"
 set title "Ways"
-#set xrange [ 0 : 20 ]
-#set yrange [ 0 : 2 ]
-#set mxtics 5
-#set mytics 5
 set format y '%.0f'
 set xtics rotate
 set xdata time
 set timefmt "%Y%m%d"
 set xtics format "%Y-%m-%d"
-#set xtics 5
-#set ytics 0.5
-#plot "$STATS" using 1:2 w l, "$STATS" using 1:3 w l, "$STATS" using 1:4 w l, "$STATS" using 1:5 w l
 plot "$WEB/$COUNTRY/stats/$COUNTRY-daily.txt" using 1:3 w l
 EOF
 
@@ -405,28 +398,72 @@ set key autotitle columnhead
 set terminal png
 set output "$WEB/$COUNTRY/stats/daily-relations.png"
 set xlabel "Date"
-#set ylabel "Values"
 set title "Relations"
-#set xrange [ 0 : 20 ]
-#set yrange [ 0 : 2 ]
-#set mxtics 5
-#set mytics 5
 set format y '%.0f'
 set xtics rotate
 set xdata time
 set timefmt "%Y%m%d"
 set xtics format "%Y-%m-%d"
-#set xtics 5
-#set ytics 0.5
-#plot "$STATS" using 1:2 w l, "$STATS" using 1:3 w l, "$STATS" using 1:4 w l, "$STATS" using 1:5 w l
 plot "$WEB/$COUNTRY/stats/$COUNTRY-daily.txt" using 1:4 w l
 EOF
 
 #done
 
-echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" gnuplot done." >> $LOG
+########################
+## Plot monthly stats ##
+########################
 
-done
+if [ $NEWDAY -eq 01 ]; then
+
+gnuplot << EOF
+set datafile separator ","
+set key autotitle columnhead
+set terminal png
+set output "$WEB/$COUNTRY/stats/monthly-nodes.png"
+set xlabel "Date"
+set title "Nodes"
+set format y '%.0f'
+set xtics rotate
+set xdata time
+set timefmt "%Y%m%d"
+set xtics format "%Y-%m-%d"
+plot "$WEB/$COUNTRY/stats/$COUNTRY-monthly.txt" using 1:2 w l
+EOF
+
+gnuplot << EOF
+set datafile separator ","
+set key autotitle columnhead
+set terminal png
+set output "$WEB/$COUNTRY/stats/monthly-ways.png"
+set xlabel "Date"
+set title "Ways"
+set format y '%.0f'
+set xtics rotate
+set xdata time
+set timefmt "%Y%m%d"
+set xtics format "%Y-%m-%d"
+plot "$WEB/$COUNTRY/stats/$COUNTRY-monthly.txt" using 1:3 w l
+EOF
+
+gnuplot << EOF
+set datafile separator ","
+set key autotitle columnhead
+set terminal png
+set output "$WEB/$COUNTRY/stats/monthly-relations.png"
+set xlabel "Date"
+set title "Relations"
+set format y '%.0f'
+set xtics rotate
+set xdata time
+set timefmt "%Y%m%d"
+set xtics format "%Y-%m-%d"
+plot "$WEB/$COUNTRY/stats/$COUNTRY-monthly.txt" using 1:4 w l
+EOF
+
+fi
+
+
+echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" gnuplot done." >> $LOG
 
 echo `date +%Y-%m-%d\ %H:%M:%S`" - All statistics finished." >> $LOG
 
