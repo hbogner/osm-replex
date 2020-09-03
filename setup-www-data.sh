@@ -35,9 +35,9 @@ mkdir $WEB/hungary/stats
 mkdir $WEB/kosovo
 mkdir $WEB/kosovo/archive
 mkdir $WEB/kosovo/stats
-mkdir $WEB/macedonia
-mkdir $WEB/macedonia/archive
-mkdir $WEB/macedonia/stats
+mkdir $WEB/northmacedonia
+mkdir $WEB/northmacedonia/archive
+mkdir $WEB/northmacedonia/stats
 mkdir $WEB/montenegro
 mkdir $WEB/montenegro/archive
 mkdir $WEB/montenegro/stats
