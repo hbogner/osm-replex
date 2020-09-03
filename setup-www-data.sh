@@ -6,10 +6,8 @@ WEB=/osm/www-data
 mkdir $WEB 
 
 ##generic folders
-mkdir $WEB/floods
 mkdir $WEB/garmin
 mkdir $WEB/gis_exports
-mkdir $WEB/irclogs
 mkdir $WEB/monthly
 mkdir $WEB/poly
 mkdir $WEB/osm
