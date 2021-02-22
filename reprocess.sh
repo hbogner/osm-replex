@@ -227,9 +227,11 @@ do
   end_time=`date +%s`
   lasted="$(( $end_time - $start_time ))"
   echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" PBF export finished in" $lasted "seconds." >> $LOG
+
 done
 
 echo `date +%Y-%m-%d\ %H:%M:%S`" - PBF export finished." >> $LOG
+
 #
 ##uvjet da se izvršava samo u ponoć
 #if [ $hour -eq 00 ]
