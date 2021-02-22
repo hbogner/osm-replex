@@ -53,53 +53,61 @@ korstat1=$STATS/korisnici_statistike_1.txt
 korstat2=$STATS/korisnici_statistike_2.txt
 statistike=$STATS/statistike.htm
 
-#####OLDSTATE=state.txt
-####
-####OLDTIMESTAMP=$(cat state.txt | grep timestamp | awk -F "=" '{print $2}')
-####OLDYEAR=${OLDTIMESTAMP:0:4}
-####OLDMONTH=${OLDTIMESTAMP:5:2}
-####OLDDAY=${OLDTIMESTAMP:8:2}
-####OLDHOUR=${OLDTIMESTAMP:11:2}
-####OLDMINUTE=${OLDTIMESTAMP:15:2}
-####OLDSECOND=${OLDTIMESTAMP:19:2}
-####
-####
-####echo "===== Replication S T A R T ====="  >> $LOG
-####echo `date +%Y-%m-%d\ %H:%M:%S`" - Starting script" >> $LOG
+#OLDSTATE=state.txt
+OLDTIMESTAMP=$(cat state.txt | grep timestamp | awk -F "=" '{print $2}')
+OLDYEAR=${OLDTIMESTAMP:0:4}
+OLDMONTH=${OLDTIMESTAMP:5:2}
+OLDDAY=${OLDTIMESTAMP:8:2}
+OLDHOUR=${OLDTIMESTAMP:11:2}
+OLDMINUTE=${OLDTIMESTAMP:15:2}
+OLDSECOND=${OLDTIMESTAMP:19:2}
+
+
+echo "===== Replication S T A R T ====="  >> $LOG
+echo `date +%Y-%m-%d\ %H:%M:%S`" - Starting script" >> $LOG
 start_time0=`date +%s`
-####
-#####print date from state.txt to log
-####awk '{if (NR!=1) {print}}' $REPLEX/state.txt >> $LOG
-####
-####
-################################################
-###### Downloading changeset from laste state.txt ##
-################################################
-####
-#####Downloading changeset and sorting
-####echo `date +%Y-%m-%d\ %H:%M:%S`" - Downloading changeset" >> $LOG
-####$osmosis --rri workingDirectory=$REPLEX --sort-change --wxc $REPLEX/$CHANGESET
-####end_time=`date +%s`
-####lasted="$(( $end_time - $start_time0 ))"
-####echo `date +%Y-%m-%d\ %H:%M:%S`" - Changeset finished in" $lasted "seconds." >> $LOG
-####
-#####print date from state.txt to log
-####awk '{if (NR!=1) {print}}' $REPLEX/state.txt >> $LOG
-####
-#############################
-###### Simplyfy changeset ##
-#############################
-####
-#####Simplify changeset
-####echo `date +%Y-%m-%d\ %H:%M:%S`" - Simplyfy changeset" >> $LOG
-####start_time=`date +%s`
-####$osmosis --read-xml-change file="$REPLEX/$CHANGESET" --simplify-change --write-xml-change file="$REPLEX/$CHANGESETSIMPLE"
-####end_time=`date +%s`
-####lasted="$(( $end_time - $start_time ))"
-####echo `date +%Y-%m-%d\ %H:%M:%S`" - Changeset simplified in" $lasted "seconds." >> $LOG
+
+#print date from state.txt to log
+echo `date +%Y-%m-%d\ %H:%M:%S`" - Stari state.txt:" >> $LOG
+awk '{if (NR!=1) {print}}' $REPLEX/state.txt >> $LOG
+
+
+############################################
+## Downloading changeset from laste state.txt ##
+############################################
+
+#Downloading changeset and sorting
+echo `date +%Y-%m-%d\ %H:%M:%S`" - Downloading changeset" >> $LOG
+$osmosis --rri workingDirectory=$REPLEX --sort-change --wxc $REPLEX/$CHANGESET
+EXITSTATUS=$?
+echo `date +%Y-%m-%d\ %H:%M:%S`" - Exit state:" $EXITSTATUS >> $LOG
+
+if [[ $EXITSTATUS -ne 0 ]] ; then
+    echo `date +%Y-%m-%d\ %H:%M:%S`" - Prekidam procesiranje" >> $LOG
+    cp $EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-state.txt $REPLEX/state.txt
+    exit 1
+fi
+
+end_time=`date +%s`
+lasted="$(( $end_time - $start_time0 ))"
+echo `date +%Y-%m-%d\ %H:%M:%S`" - Changeset finished in" $lasted "seconds." >> $LOG
+
+
+#########################
+## Simplyfy changeset ##
+#########################
+
+#Simplify changeset
+echo `date +%Y-%m-%d\ %H:%M:%S`" - Simplyfy changeset" >> $LOG
+start_time=`date +%s`
+$osmosis --read-xml-change file="$REPLEX/$CHANGESET" --simplify-change --write-xml-change file="$REPLEX/$CHANGESETSIMPLE"
+EXITSTATUS=$?
+echo `date +%Y-%m-%d\ %H:%M:%S`" - Exit state:" $EXITSTATUS >> $LOG
+end_time=`date +%s`
+lasted="$(( $end_time - $start_time ))"
+echo `date +%Y-%m-%d\ %H:%M:%S`" - Changeset simplified in" $lasted "seconds." >> $LOG
 
 #NEWSTATE=state.txt
-
 NEWTIMESTAMP=$(cat state.txt | grep timestamp | awk -F "=" '{print $2}')
 NEWYEAR=${NEWTIMESTAMP:0:4}
 NEWMONTH=${NEWTIMESTAMP:5:2}
@@ -108,37 +116,56 @@ NEWHOUR=${NEWTIMESTAMP:11:2}
 NEWMINUTE=${NEWTIMESTAMP:15:2}
 NEWSECOND=${NEWTIMESTAMP:19:2}
 
-################################################
-###### Primjena changeseta uz rezanje granice ##
-################################################
-####
-#####Primjena changeseta uz rezanje granice
-####echo `date +%Y-%m-%d\ %H:%M:%S`" - Apply changeset to europe file" >> $LOG
-####start_time=`date +%s`
-####$osmosis --read-xml-change file="$REPLEX/$CHANGESETSIMPLE" --read-pbf file="$EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-europe-east.osm.pbf" --apply-change --bounding-polygon clipIncompleteEntities="true" file="$POLY/europe-east.poly" --write-pbf file="$REPLEX/europe-east.osm.pbf"
-####end_time=`date +%s`
-####lasted="$(( $end_time - $start_time ))"
-####echo `date +%Y-%m-%d\ %H:%M:%S`" - Changeset applied and cropped in" $lasted "seconds." >> $LOG
-####
-####
-################################################
-###### backup europe-east.osm.pbf i state.txt ##
-################################################
-####start_time=`date +%s`
-#####remove changesets
-####rm $REPLEX/$CHANGESET
-####rm $REPLEX/$CHANGESETSIMPLE
-####echo `date +%Y-%m-%d\ %H:%M:%S`" - Changesets removed." >> $LOG
-####
-#####move new europe file over old one and copy it to web
-####mv $REPLEX/europe-east.osm.pbf $EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf
-####touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf
-####cp -p $EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf $PBF/europe-east.osm.pbf
-#####copy state file to web
-####cp -p $REPLEX/state.txt $PBF/state.txt
-####cp -p $REPLEX/state.txt $EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-state.txt
-####touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-state.txt
-####echo `date +%Y-%m-%d\ %H:%M:%S`" - Europe and state.txt copied to web." >> $LOG
+#print date from state.txt to log
+echo `date +%Y-%m-%d\ %H:%M:%S`" - Novi state.txt:" >> $LOG
+awk '{if (NR!=1) {print}}' $REPLEX/state.txt >> $LOG
+
+############################################
+## Primjena changeseta uz rezanje granice ##
+############################################
+
+#Primjena changeseta uz rezanje granice
+echo `date +%Y-%m-%d\ %H:%M:%S`" - Apply changeset to europe file" >> $LOG
+start_time=`date +%s`
+$osmosis --read-xml-change file="$REPLEX/$CHANGESETSIMPLE" --read-pbf file="$EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-europe-east.osm.pbf" --apply-change --bounding-polygon clipIncompleteEntities="true" file="$POLY/europe-east.poly" --write-pbf file="$REPLEX/europe-east.osm.pbf"
+EXITSTATUS=$?
+echo `date +%Y-%m-%d\ %H:%M:%S`" - Exit state:" $EXITSTATUS >> $LOG
+end_time=`date +%s`
+lasted="$(( $end_time - $start_time ))"
+echo `date +%Y-%m-%d\ %H:%M:%S`" - Changeset applied and cropped in" $lasted "seconds." >> $LOG
+
+
+############################################
+## backup europe-east.osm.pbf i state.txt ##
+############################################
+start_time=`date +%s`
+#remove changesets
+rm $REPLEX/$CHANGESET
+rm $REPLEX/$CHANGESETSIMPLE
+echo `date +%Y-%m-%d\ %H:%M:%S`" - Changesets removed." >> $LOG
+
+#move new europe file over old one and copy it to web
+mv $REPLEX/europe-east.osm.pbf $EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf
+touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf
+cp -p $EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf $PBF/europe-east.osm.pbf
+#copy state file to web
+touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $REPLEX/state.txt
+cp -p $REPLEX/state.txt $PBF/state.txt
+cp -p $REPLEX/state.txt $EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-state.txt
+echo `date +%Y-%m-%d\ %H:%M:%S`" - Europe and state.txt copied to web." >> $LOG
+
+##montly backup of europe-east.osm.pbf
+if [ $NEWDAY -eq 01 ]
+ then
+ #test if file $WEB/monthly/$OLDYEAR$OLDMONTH$OLDDAY-europe-east.osm.pbf doesn't exist copy
+ if [[ ! -f $WEB/monthly/$OLDYEAR$OLDMONTH$OLDDAY-europe-east.osm.pbf ]]
+   then
+   #copy europe dated backup to web monthly folder
+   cp -p $EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-europe-east.osm.pbf $WEB/monthly/$OLDYEAR$OLDMONTH$OLDDAY-europe-east.osm.pbf
+   cp -p $EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-state.txt EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-state.txt
+   echo `date +%Y-%m-%d\ %H:%M:%S`" - Europe monthly archive copied to web." >> $LOG
+ fi
+fi
 
 ####################################################
 ### dnevni backup europe-east.osm.pbf i state.txt ##
