@@ -212,12 +212,18 @@ do
   echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" export started" >> $LOG
   start_time=`date +%s`
   $osmosis --read-pbf file="$EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf" --bounding-polygon clipIncompleteEntities="true" file="$POLY/$COUNTRY.poly" --write-pbf file="$DATA/$COUNTRY.osm.pbf"
+  touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $DATA/$COUNTRY.osm.pbf
   cp -p $DATA/$COUNTRY.osm.pbf $PBF/$COUNTRY.osm.pbf
-  if [[ ! -d $WEB/$COUNTRY/archive/$NEWYEAR/ ]]; then
-  mkdir $WEB/$COUNTRY/archive/$NEWYEAR/
+  if [ $NEWDAY -eq 01 ]; then
+    if [[ ! -d $WEB/$COUNTRY/archive/$NEWYEAR/ ]]; then
+      mkdir $WEB/$COUNTRY/archive/$NEWYEAR/
+      echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY $NEWYEAR" folder created" >> $LOG
+    fi
+    if [[ ! -f $WEB/$COUNTRY/archive/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf ]]; then
+      cp -p $PBF/$COUNTRY.osm.pbf $WEB/$COUNTRY/archive/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf
+      echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY $NEWYEAR" monthly export created" >> $LOG
+    #touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $WEB/$COUNTRY/archive/$NEWYEAR/$NEWYEAR$NEWMONTH$NEWDAY-$COUNTRY.osm.pbf
   fi
-  cp -p $PBF/$COUNTRY.osm.pbf $WEB/$COUNTRY/archive/$NEWYEAR/$NEWYEAR$NEWMONTH$NEWDAY-$COUNTRY.osm.pbf
-  touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $WEB/$COUNTRY/archive/$NEWYEAR/$NEWYEAR$NEWMONTH$NEWDAY-$COUNTRY.osm.pbf
   end_time=`date +%s`
   lasted="$(( $end_time - $start_time ))"
   echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" PBF export finished in" $lasted "seconds." >> $LOG
@@ -342,22 +348,23 @@ echo `date +%Y-%m-%d\ %H:%M:%S`" - PBF export finished." >> $LOG
 
 for COUNTRY in albania #bosnia-herzegovina bulgaria croatia hungary kosovo northmacedonia montenegro romania serbia slovenia
 do
+  if [[ ! -f $WEB/$COUNTRY/stats/$COUNTRY-daily.txt ]]; then
+  echo "Date,Size,Nodes,Ways,Relations" >> $WEB/$COUNTRY/stats/$COUNTRY-daily.txt
+  fi
   if [[ ! -f $WEB/$COUNTRY/stats/$COUNTRY-monthly.txt ]]; then
-  echo "Date,Nodes,Ways,Relations" >> $WEB/$COUNTRY/stats/$COUNTRY-monthly.txt
+  echo "Date,Size,Nodes,Ways,Relations" >> $WEB/$COUNTRY/stats/$COUNTRY-monthly.txt
   fi
   if [ $NEWDAY -eq 01 ]; then 
-    tail -n 1$WEB/$COUNTRY/stats/$COUNTRY-daily.txt >> $WEB/$COUNTRY/stats/$COUNTRY-monthly.txt
+    tail -n 1 $WEB/$COUNTRY/stats/$COUNTRY-daily.txt >> $WEB/$COUNTRY/stats/$COUNTRY-monthly.txt
   fi
+  TOTAL_SIZE=`wc -c $PBF/$COUNTRY.osm.pbf | awk '{print $1}'`
   $osmconvert --out-statistics $PBF/$COUNTRY.osm.pbf > $STATS/$COUNTRY-stats.txt
   TOTAL_NODE=`cat $STATS/$COUNTRY-stats.txt | grep nodes | awk -F ' ' '{print $2}'`
   TOTAL_WAY=`cat $STATS/$COUNTRY-stats.txt | grep ways | awk -F ' ' '{print $2}'`
   TOTAL_RELATION=`cat $STATS/$COUNTRY-stats.txt | grep relations | awk -F ' ' '{print $2}'`
   #country total stats
   #check if statitstics exist and create it if not
-  if [[ ! -f $WEB/$COUNTRY/stats/$COUNTRY-daily.txt ]]; then
-  echo "Date,Nodes,Ways,Relations" >> $WEB/$COUNTRY/stats/$COUNTRY-daily.txt
-  fi
-  echo $NEWYEAR$NEWMONTH$NEWDAY','$TOTAL_NODE','$TOTAL_WAY','$TOTAL_RELATION >> $WEB/$COUNTRY/stats/$COUNTRY-daily.txt
+  echo $NEWYEAR$NEWMONTH$NEWDAY','$TOTAL_SIZE','$TOTAL_NODE','$TOTAL_WAY','$TOTAL_RELATION >> $WEB/$COUNTRY/stats/$COUNTRY-daily.txt
   #next 2lines to be replaced with symlink on server
   #cp -p $WEB/$COUNTRY/stats/$COUNTRY-total.txt $WEB/$COUNTRY/$COUNTRY-total.txt
   #cp -p $WEB/$COUNTRY/stats/$COUNTRY-total.txt $WEB/statistics/$COUNTRY-total.txt
