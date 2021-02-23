@@ -377,9 +377,7 @@ do
   #cp -p $WEB/$COUNTRY/stats/$COUNTRY-total.txt $WEB/$COUNTRY/$COUNTRY-total.txt
   #cp -p $WEB/$COUNTRY/stats/$COUNTRY-total.txt $WEB/statistics/$COUNTRY-total.txt
   echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" csv files created and copied to web." >> $LOG
-done
 
-fi
 
 ######################
 ## Plot daily stats ##
@@ -506,6 +504,9 @@ EOF
 
 fi
 
+done
+
+fi
 
 echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" gnuplot done." >> $LOG
 
