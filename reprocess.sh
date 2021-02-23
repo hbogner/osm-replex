@@ -167,6 +167,9 @@ if [ $NEWDAY -eq 01 ]
  fi
 fi
 
+## delete europe files older than 35 days
+#find $EUROPE -type f -name "*-europe-east.osm.pbf" -mtime +35 -exec rm -f {} \; 
+
 ####################################################
 ### dnevni backup europe-east.osm.pbf i state.txt ##
 ####################################################
