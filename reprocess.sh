@@ -223,6 +223,7 @@ do
       cp -p $PBF/$COUNTRY.osm.pbf $WEB/$COUNTRY/archive/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf
       echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY $NEWYEAR" monthly export created" >> $LOG
     #touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $WEB/$COUNTRY/archive/$NEWYEAR/$NEWYEAR$NEWMONTH$NEWDAY-$COUNTRY.osm.pbf
+    fi
   fi
   end_time=`date +%s`
   lasted="$(( $end_time - $start_time ))"
