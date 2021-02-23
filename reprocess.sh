@@ -207,7 +207,7 @@ echo `date +%Y-%m-%d\ %H:%M:%S`" - PBF export starting." >> $LOG
 
 ## Extracts countfy from europe##
 
-for COUNTRY in albania #bosnia-herzegovina bulgaria croatia hungary kosovo northmacedonia montenegro romania serbia slovenia 
+for COUNTRY in albania bosnia-herzegovina bulgaria croatia hungary kosovo northmacedonia montenegro romania serbia slovenia 
 do
   echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" export started" >> $LOG
   start_time=`date +%s`
@@ -350,7 +350,7 @@ echo `date +%Y-%m-%d\ %H:%M:%S`" - PBF export finished." >> $LOG
 
 if [ $NEWHOUR -eq 01 ]; then 
 
-for COUNTRY in albania #bosnia-herzegovina bulgaria croatia hungary kosovo northmacedonia montenegro romania serbia slovenia
+for COUNTRY in albania bosnia-herzegovina bulgaria croatia hungary kosovo northmacedonia montenegro romania serbia slovenia
 do
   if [[ ! -f $WEB/$COUNTRY/stats/$COUNTRY-daily.txt ]]; then
   echo "Date,Size,Nodes,Ways,Relations" >> $WEB/$COUNTRY/stats/$COUNTRY-daily.txt
