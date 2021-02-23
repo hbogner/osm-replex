@@ -348,6 +348,8 @@ echo `date +%Y-%m-%d\ %H:%M:%S`" - PBF export finished." >> $LOG
 ## Daily statistics ##
 ######################
 
+if [ $NEWHOUR -eq 01 ]; then 
+
 for COUNTRY in albania #bosnia-herzegovina bulgaria croatia hungary kosovo northmacedonia montenegro romania serbia slovenia
 do
   if [[ ! -f $WEB/$COUNTRY/stats/$COUNTRY-daily.txt ]]; then
@@ -359,19 +361,21 @@ do
   if [ $NEWDAY -eq 01 ]; then 
     tail -n 1 $WEB/$COUNTRY/stats/$COUNTRY-daily.txt >> $WEB/$COUNTRY/stats/$COUNTRY-monthly.txt
   fi
-  TOTAL_SIZE=`wc -c $PBF/$COUNTRY.osm.pbf | awk '{print $1}'`
-  $osmconvert --out-statistics $PBF/$COUNTRY.osm.pbf > $STATS/$COUNTRY-stats.txt
+  TOTAL_SIZE=`wc -c $WEB/$COUNTRY/archive/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf | awk '{print $1}'`
+  $osmconvert --out-statistics $WEB/$COUNTRY/archive/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf > $STATS/$COUNTRY-stats.txt
   TOTAL_NODE=`cat $STATS/$COUNTRY-stats.txt | grep nodes | awk -F ' ' '{print $2}'`
   TOTAL_WAY=`cat $STATS/$COUNTRY-stats.txt | grep ways | awk -F ' ' '{print $2}'`
   TOTAL_RELATION=`cat $STATS/$COUNTRY-stats.txt | grep relations | awk -F ' ' '{print $2}'`
   #country total stats
   #check if statitstics exist and create it if not
-  echo $NEWYEAR$NEWMONTH$NEWDAY','$TOTAL_SIZE','$TOTAL_NODE','$TOTAL_WAY','$TOTAL_RELATION >> $WEB/$COUNTRY/stats/$COUNTRY-daily.txt
+  echo $OLDYEAR$OLDMONTH$OLDDAY','$TOTAL_SIZE','$TOTAL_NODE','$TOTAL_WAY','$TOTAL_RELATION >> $WEB/$COUNTRY/stats/$COUNTRY-daily.txt
   #next 2lines to be replaced with symlink on server
   #cp -p $WEB/$COUNTRY/stats/$COUNTRY-total.txt $WEB/$COUNTRY/$COUNTRY-total.txt
   #cp -p $WEB/$COUNTRY/stats/$COUNTRY-total.txt $WEB/statistics/$COUNTRY-total.txt
-echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" csv files created and copied to web." >> $LOG
+  echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" csv files created and copied to web." >> $LOG
 done
+
+fi
 
 ######################
 ## Plot daily stats ##
