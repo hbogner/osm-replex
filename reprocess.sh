@@ -352,7 +352,7 @@ echo `date +%Y-%m-%d\ %H:%M:%S`" - PBF export finished." >> $LOG
 ## Daily statistics ##
 ######################
 
-if [ $NEWHOUR -eq 01 ]; then 
+if [ $NEWHOUR -eq 00 ]; then 
 
 for COUNTRY in albania bosnia-herzegovina bulgaria croatia hungary kosovo northmacedonia montenegro romania serbia slovenia
 do
