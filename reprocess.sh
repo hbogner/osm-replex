@@ -212,20 +212,33 @@ echo `date +%Y-%m-%d\ %H:%M:%S`" - PBF export starting." >> $LOG
 
 for COUNTRY in albania bosnia-herzegovina bulgaria croatia hungary kosovo northmacedonia montenegro romania serbia slovenia 
 do
+
+  if [[ ! -d $WEB/$COUNTRY/daily ]]; then
+    mkdir $WEB/$COUNTRY/daily
+    echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" daily folder created" >> $LOG
+  fi
+
+  if [[ ! -d $WEB/$COUNTRY/monthly ]]; then
+    mkdir $WEB/$COUNTRY/monthly
+    echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" daily folder created" >> $LOG
+  fi
+
   echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" export started" >> $LOG
   start_time=`date +%s`
   $osmosis --read-pbf file="$EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf" --bounding-polygon clipIncompleteEntities="true" file="$POLY/$COUNTRY.poly" --write-pbf file="$DATA/$COUNTRY.osm.pbf"
   touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $DATA/$COUNTRY.osm.pbf
   cp -p $DATA/$COUNTRY.osm.pbf $PBF/$COUNTRY.osm.pbf
+  cp -p $DATA/$COUNTRY.osm.pbf $OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf
+  find $WEB/$COUNTRY/daily/ -type f -name "*.osm.pbf" -mtime +35 -exec rm -f {} \;
   if [ $NEWDAY -eq 01 ]; then
-    if [[ ! -d $WEB/$COUNTRY/archive/$NEWYEAR/ ]]; then
-      mkdir $WEB/$COUNTRY/archive/$NEWYEAR/
+    if [[ ! -d $WEB/$COUNTRY/monthly/$NEWYEAR/ ]]; then
+      mkdir $WEB/$COUNTRY/monthly/$NEWYEAR/
       echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY $NEWYEAR" folder created" >> $LOG
     fi
-    if [[ ! -f $WEB/$COUNTRY/archive/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf ]]; then
-      cp -p $PBF/$COUNTRY.osm.pbf $WEB/$COUNTRY/archive/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf
+    if [[ ! -f $WEB/$COUNTRY/monthly/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf ]]; then
+      cp -p $PBF/$COUNTRY.osm.pbf $WEB/$COUNTRY/monthly/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf
       echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY $NEWYEAR" monthly export created" >> $LOG
-    #touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $WEB/$COUNTRY/archive/$NEWYEAR/$NEWYEAR$NEWMONTH$NEWDAY-$COUNTRY.osm.pbf
+    #touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $WEB/$COUNTRY/monthly/$NEWYEAR/$NEWYEAR$NEWMONTH$NEWDAY-$COUNTRY.osm.pbf
     fi
   fi
   end_time=`date +%s`
@@ -242,10 +255,10 @@ echo `date +%Y-%m-%d\ %H:%M:%S`" - PBF export finished." >> $LOG
 #  start_time=`date +%s`
 #  then
 #  ##kopira croatia sa datumom ######################
-#  cp -p $PBF/croatia.osm.pbf $WEB/croatia/archive/$yesterday-croatia.osm.pbf
-#  echo `date +%Y-%m-%d\ %H:%M:%S`" - Croatia daily archive created." >> $LOG
+#  cp -p $PBF/croatia.osm.pbf $WEB/croatia/monthly/$yesterday-croatia.osm.pbf
+#  echo `date +%Y-%m-%d\ %H:%M:%S`" - Croatia daily monthly created." >> $LOG
 #  ## izvlaci dnevni changeset ######################
-#  $osmosis --read-pbf file="$WEB/croatia/archive/$daysago-croatia.osm.pbf" --read-pbf file="$WEB/croatia/archive/$yesterday-croatia.osm.pbf" --derive-change --write-xml-change compressionMethod=gzip file="$WEB/croatia/archive/$daysago-$yesterday-croatia.osc.gz"
+#  $osmosis --read-pbf file="$WEB/croatia/monthly/$daysago-croatia.osm.pbf" --read-pbf file="$WEB/croatia/monthly/$yesterday-croatia.osm.pbf" --derive-change --write-xml-change compressionMethod=gzip file="$WEB/croatia/monthly/$daysago-$yesterday-croatia.osc.gz"
 #  end_time=`date +%s`
 #  lasted="$(( $end_time - $start_time ))"
 #  echo `date +%Y-%m-%d\ %H:%M:%S`" - Croatia diff finished in" $lasted "seconds." >> $LOG
@@ -254,8 +267,8 @@ echo `date +%Y-%m-%d\ %H:%M:%S`" - PBF export finished." >> $LOG
 #   for COUNTRY in albania bosnia-herzegovina bulgaria hungary kosovo northmacedonia montenegro romania serbia slovenia
 #    do
 #      #copy COUNTRY monthly backup
-#      cp -p $PBF/$COUNTRY.osm.pbf $WEB/$COUNTRY/archive/$yesterday-$COUNTRY.osm.pbf
-#      echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" monthly archive created." >> $LOG
+#      cp -p $PBF/$COUNTRY.osm.pbf $WEB/$COUNTRY/monthly/$yesterday-$COUNTRY.osm.pbf
+#      echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" monthly monthly created." >> $LOG
 #    done
 #  fi
 #fi
@@ -365,8 +378,8 @@ do
   if [ $NEWDAY -eq 01 ]; then 
     tail -n 1 $WEB/$COUNTRY/stats/$COUNTRY-daily.txt >> $WEB/$COUNTRY/stats/$COUNTRY-monthly.txt
   fi
-  TOTAL_SIZE=`wc -c $WEB/$COUNTRY/archive/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf | awk '{print $1}'`
-  $osmconvert --out-statistics $WEB/$COUNTRY/archive/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf > $STATS/$COUNTRY-stats.txt
+  TOTAL_SIZE=`wc -c $WEB/$COUNTRY/daily/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf | awk '{print $1}'`
+  $osmconvert --out-statistics $WEB/$COUNTRY/daily/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf > $STATS/$COUNTRY-stats.txt
   TOTAL_NODE=`cat $STATS/$COUNTRY-stats.txt | grep nodes | awk -F ' ' '{print $2}'`
   TOTAL_WAY=`cat $STATS/$COUNTRY-stats.txt | grep ways | awk -F ' ' '{print $2}'`
   TOTAL_RELATION=`cat $STATS/$COUNTRY-stats.txt | grep relations | awk -F ' ' '{print $2}'`
@@ -416,7 +429,7 @@ set xtics format "%Y-%m-%d"
 #set xtics 5
 #set ytics 0.5
 #plot "$STATS" using 1:2 w l, "$STATS" using 1:3 w l, "$STATS" using 1:4 w l, "$STATS" using 1:5 w l
-plot "$WEB/$COUNTRY/stats/$COUNTRY-daily.txt" using 1:2 w l
+plot "$WEB/$COUNTRY/stats/$COUNTRY-daily.txt" using 1:3 w l
 EOF
 
 gnuplot << EOF
@@ -431,7 +444,7 @@ set xtics rotate
 set xdata time
 set timefmt "%Y%m%d"
 set xtics format "%Y-%m-%d"
-plot "$WEB/$COUNTRY/stats/$COUNTRY-daily.txt" using 1:3 w l
+plot "$WEB/$COUNTRY/stats/$COUNTRY-daily.txt" using 1:4 w l
 EOF
 
 gnuplot << EOF
@@ -446,7 +459,7 @@ set xtics rotate
 set xdata time
 set timefmt "%Y%m%d"
 set xtics format "%Y-%m-%d"
-plot "$WEB/$COUNTRY/stats/$COUNTRY-daily.txt" using 1:4 w l
+plot "$WEB/$COUNTRY/stats/$COUNTRY-daily.txt" using 1:5 w l
 EOF
 
 #done
@@ -469,7 +482,7 @@ set xtics rotate
 set xdata time
 set timefmt "%Y%m%d"
 set xtics format "%Y-%m-%d"
-plot "$WEB/$COUNTRY/stats/$COUNTRY-monthly.txt" using 1:2 w l
+plot "$WEB/$COUNTRY/stats/$COUNTRY-monthly.txt" using 1:3 w l
 EOF
 
 gnuplot << EOF
@@ -484,7 +497,7 @@ set xtics rotate
 set xdata time
 set timefmt "%Y%m%d"
 set xtics format "%Y-%m-%d"
-plot "$WEB/$COUNTRY/stats/$COUNTRY-monthly.txt" using 1:3 w l
+plot "$WEB/$COUNTRY/stats/$COUNTRY-monthly.txt" using 1:4 w l
 EOF
 
 gnuplot << EOF
@@ -499,7 +512,7 @@ set xtics rotate
 set xdata time
 set timefmt "%Y%m%d"
 set xtics format "%Y-%m-%d"
-plot "$WEB/$COUNTRY/stats/$COUNTRY-monthly.txt" using 1:4 w l
+plot "$WEB/$COUNTRY/stats/$COUNTRY-monthly.txt" using 1:5 w l
 EOF
 
 fi
