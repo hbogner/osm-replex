@@ -53,6 +53,18 @@ korstat1=$STATS/korisnici_statistike_1.txt
 korstat2=$STATS/korisnici_statistike_2.txt
 statistike=$STATS/statistike.htm
 
+
+for i in {1..2}
+do
+
+echo "###############################" >> $LOG
+echo "##  Nadoknada iteracija:" $i " ##" >> $LOG
+echo "###############################" >> $LOG
+
+echo "===== Replication S T A R T ====="  >> $LOG
+echo `date +%Y-%m-%d\ %H:%M:%S`" - Starting script" >> $LOG
+start_time0=`date +%s`
+
 #OLDSTATE=state.txt
 OLDTIMESTAMP=$(cat state.txt | grep timestamp | awk -F "=" '{print $2}')
 OLDYEAR=${OLDTIMESTAMP:0:4}
@@ -61,11 +73,6 @@ OLDDAY=${OLDTIMESTAMP:8:2}
 OLDHOUR=${OLDTIMESTAMP:11:2}
 OLDMINUTE=${OLDTIMESTAMP:15:2}
 OLDSECOND=${OLDTIMESTAMP:19:2}
-
-
-echo "===== Replication S T A R T ====="  >> $LOG
-echo `date +%Y-%m-%d\ %H:%M:%S`" - Starting script" >> $LOG
-start_time0=`date +%s`
 
 #print date from state.txt to log
 echo `date +%Y-%m-%d\ %H:%M:%S`" - Stari state.txt:" >> $LOG
@@ -562,3 +569,5 @@ end_time=`date +%s`
 lasted="$(( $end_time - $start_time0 ))"
 echo `date +%Y-%m-%d\ %H:%M:%S`" - Complete script finished in" $lasted "seconds." >> $LOG    
 echo "===== Replication E N D====="  >> $LOG
+
+done
