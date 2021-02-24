@@ -170,7 +170,7 @@ if [ $NEWDAY -eq 01 ];  then
  #  then
    #copy europe dated backup to web monthly folder
    cp -p $EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-europe-east.osm.pbf $WEB/monthly/$OLDYEAR$OLDMONTH$OLDDAY-europe-east.osm.pbf
-   cp -p $EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-state.txt $EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-state.txt
+   cp -p $EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-state.txt $WEB/monthly/$OLDYEAR$OLDMONTH$OLDDAY-state.txt
    echo `date +%Y-%m-%d\ %H:%M:%S`" - Europe monthly archive copied to web." >> $LOG
   fi
 fi
