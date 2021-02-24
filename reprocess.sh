@@ -235,27 +235,31 @@ do
     echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" daily folder created" >> $LOG
   fi
 
+#  find $WEB/$COUNTRY/daily/ -type f -name "*.osm.pbf" -mtime +35 -exec rm -f {} \;
+#    if [[ ! -d $WEB/$COUNTRY/monthly/$NEWYEAR/ ]]; then
+#      mkdir $WEB/$COUNTRY/monthly/$NEWYEAR/
+#      echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY $NEWYEAR" folder created" >> $LOG
+#    fi
+#    if [[ ! -f $WEB/$COUNTRY/monthly/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf ]]; then
+  if [ $NEWHOUR -eq 00 ]; then 
+    cp -p $pbf/$COUNTRY.osm.pbf $WEB/$COUNTRY/daily/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf
+    if [ $NEWDAY -eq 01 ]; then
+      cp -p $PBF/$COUNTRY.osm.pbf $WEB/$COUNTRY/monthly/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf
+      echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY $NEWYEAR" monthly export created" >> $LOG
+    #touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $WEB/$COUNTRY/monthly/$NEWYEAR/$NEWYEAR$NEWMONTH$NEWDAY-$COUNTRY.osm.pbf
+    fi
+
+  #starting daily exports
   echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" export started" >> $LOG
   start_time=`date +%s`
   $osmosis --read-pbf file="$EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf" --bounding-polygon clipIncompleteEntities="true" file="$POLY/$COUNTRY.poly" --write-pbf file="$DATA/$COUNTRY.osm.pbf"
   touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $DATA/$COUNTRY.osm.pbf
   cp -p $DATA/$COUNTRY.osm.pbf $PBF/$COUNTRY.osm.pbf
-  cp -p $DATA/$COUNTRY.osm.pbf $OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf
-  find $WEB/$COUNTRY/daily/ -type f -name "*.osm.pbf" -mtime +35 -exec rm -f {} \;
-  if [ $NEWDAY -eq 01 ]; then
-    if [[ ! -d $WEB/$COUNTRY/monthly/$NEWYEAR/ ]]; then
-      mkdir $WEB/$COUNTRY/monthly/$NEWYEAR/
-      echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY $NEWYEAR" folder created" >> $LOG
-    fi
-    if [[ ! -f $WEB/$COUNTRY/monthly/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf ]]; then
-      cp -p $PBF/$COUNTRY.osm.pbf $WEB/$COUNTRY/monthly/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf
-      echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY $NEWYEAR" monthly export created" >> $LOG
-    #touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $WEB/$COUNTRY/monthly/$NEWYEAR/$NEWYEAR$NEWMONTH$NEWDAY-$COUNTRY.osm.pbf
-    fi
-  fi
   end_time=`date +%s`
   lasted="$(( $end_time - $start_time ))"
   echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" PBF export finished in" $lasted "seconds." >> $LOG
+
+  fi
 
 done
 
