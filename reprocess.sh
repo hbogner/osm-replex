@@ -159,19 +159,20 @@ cp -p $EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf $PBF/europe-east.osm.
 touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $REPLEX/state.txt
 cp -p $REPLEX/state.txt $PBF/state.txt
 cp -p $REPLEX/state.txt $EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-state.txt
-echo `date +%Y-%m-%d\ %H:%M:%S`" - Europe and state.txt copied to web." >> $LOG
+echo `date +%Y-%m-%d\ %H:%M:%S`" - Europe and state.txt copied to archive and web." >> $LOG
 
 ##montly backup of europe-east.osm.pbf
-if [ $NEWDAY -eq 01 ]
- then
+if [ $NEWDAY -eq 01 ];  then
+  if [ $NEWHOUR -eq 00 ]; then 
+
  #test if file $WEB/monthly/$OLDYEAR$OLDMONTH$OLDDAY-europe-east.osm.pbf doesn't exist copy
- if [[ ! -f $WEB/monthly/$OLDYEAR$OLDMONTH$OLDDAY-europe-east.osm.pbf ]]
-   then
+ #if [[ ! -f $WEB/monthly/$OLDYEAR$OLDMONTH$OLDDAY-europe-east.osm.pbf ]]
+ #  then
    #copy europe dated backup to web monthly folder
    cp -p $EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-europe-east.osm.pbf $WEB/monthly/$OLDYEAR$OLDMONTH$OLDDAY-europe-east.osm.pbf
    cp -p $EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-state.txt $EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-state.txt
    echo `date +%Y-%m-%d\ %H:%M:%S`" - Europe monthly archive copied to web." >> $LOG
- fi
+  fi
 fi
 
 ## delete europe files older than 35 days
