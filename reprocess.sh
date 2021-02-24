@@ -54,7 +54,7 @@ korstat2=$STATS/korisnici_statistike_2.txt
 statistike=$STATS/statistike.htm
 
 
-for i in {1..2}
+for i in {1..24}
 do
 
 echo "###############################" >> $LOG
@@ -120,6 +120,11 @@ NEWDAY=${NEWTIMESTAMP:8:2}
 NEWHOUR=${NEWTIMESTAMP:11:2}
 NEWMINUTE=${NEWTIMESTAMP:15:2}
 NEWSECOND=${NEWTIMESTAMP:19:2}
+
+#if [[ $NEWHOUR -ne 00 ]] ; then
+#    exit 1
+#echo `date +%Y-%m-%d\ %H:%M:%S`" - Daylight saving time change" >> $LOG
+#fi
 
 #print date from state.txt to log
 echo `date +%Y-%m-%d\ %H:%M:%S`" - Novi state.txt:" >> $LOG
@@ -232,7 +237,7 @@ do
 
   if [[ ! -d $WEB/$COUNTRY/monthly ]]; then
     mkdir $WEB/$COUNTRY/monthly
-    echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" daily folder created" >> $LOG
+    echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" monthly folder created" >> $LOG
   fi
 
 #  find $WEB/$COUNTRY/daily/ -type f -name "*.osm.pbf" -mtime +35 -exec rm -f {} \;
@@ -242,7 +247,7 @@ do
 #    fi
 #    if [[ ! -f $WEB/$COUNTRY/monthly/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf ]]; then
   if [ $NEWHOUR -eq 00 ]; then 
-    cp -p $pbf/$COUNTRY.osm.pbf $WEB/$COUNTRY/daily/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf
+    cp -p $PBF/$COUNTRY.osm.pbf $WEB/$COUNTRY/daily/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf
     if [ $NEWDAY -eq 01 ]; then
       cp -p $PBF/$COUNTRY.osm.pbf $WEB/$COUNTRY/monthly/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf
       echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY $NEWYEAR" monthly export created" >> $LOG
@@ -255,6 +260,7 @@ do
   $osmosis --read-pbf file="$EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf" --bounding-polygon clipIncompleteEntities="true" file="$POLY/$COUNTRY.poly" --write-pbf file="$DATA/$COUNTRY.osm.pbf"
   touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $DATA/$COUNTRY.osm.pbf
   cp -p $DATA/$COUNTRY.osm.pbf $PBF/$COUNTRY.osm.pbf
+  #ln -s $PBF/$COUNTRY.osm.pbf $WEB/$COUNTRY/$COUNTRY.osm.pbf
   end_time=`date +%s`
   lasted="$(( $end_time - $start_time ))"
   echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" PBF export finished in" $lasted "seconds." >> $LOG
