@@ -78,7 +78,6 @@ OLDSECOND=${OLDTIMESTAMP:19:2}
 echo `date +%Y-%m-%d\ %H:%M:%S`" - Stari state.txt:" >> $LOG
 awk '{if (NR!=1) {print}}' $REPLEX/state.txt >> $LOG
 
-
 ############################################
 ## Downloading changeset from laste state.txt ##
 ############################################
@@ -98,7 +97,6 @@ fi
 end_time=`date +%s`
 lasted="$(( $end_time - $start_time0 ))"
 echo `date +%Y-%m-%d\ %H:%M:%S`" - Changeset finished in" $lasted "seconds." >> $LOG
-
 
 #########################
 ## Simplyfy changeset ##
@@ -137,6 +135,12 @@ start_time=`date +%s`
 $osmosis --read-xml-change file="$REPLEX/$CHANGESETSIMPLE" --read-pbf file="$EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-europe-east.osm.pbf" --apply-change --bounding-polygon clipIncompleteEntities="true" file="$POLY/europe-east.poly" --write-pbf file="$REPLEX/europe-east.osm.pbf"
 EXITSTATUS=$?
 echo `date +%Y-%m-%d\ %H:%M:%S`" - Exit state:" $EXITSTATUS >> $LOG
+
+#remove changesets
+rm $REPLEX/$CHANGESET
+rm $REPLEX/$CHANGESETSIMPLE
+echo `date +%Y-%m-%d\ %H:%M:%S`" - Changesets removed." >> $LOG
+
 end_time=`date +%s`
 lasted="$(( $end_time - $start_time ))"
 echo `date +%Y-%m-%d\ %H:%M:%S`" - Changeset applied and cropped in" $lasted "seconds." >> $LOG
@@ -146,10 +150,6 @@ echo `date +%Y-%m-%d\ %H:%M:%S`" - Changeset applied and cropped in" $lasted "se
 ## backup europe-east.osm.pbf i state.txt ##
 ############################################
 start_time=`date +%s`
-#remove changesets
-rm $REPLEX/$CHANGESET
-rm $REPLEX/$CHANGESETSIMPLE
-echo `date +%Y-%m-%d\ %H:%M:%S`" - Changesets removed." >> $LOG
 
 #move new europe file over old one and copy it to web
 mv $REPLEX/europe-east.osm.pbf $EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf
