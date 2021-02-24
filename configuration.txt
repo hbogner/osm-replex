@@ -6,18 +6,28 @@ baseUrl=https://planet.openstreetmap.org/replication/hour/
 # Defines the maximum time interval in seconds to download in a single invocation.
 # Setting to 0 disables this feature.
 #maxInterval = 0
-#86400 = 1 dan
-maxInterval = 86400
-#172800 = 2 dana
+
+#1 hour
+maxInterval = 3600
+
+#1 day
+#maxInterval = 86400
+
+#2 day
 #maxInterval = 172800
-#259200 = 3 dana
+
+#3 days
 #maxInterval = 259200
-#345600 = 4 dana
+
+#4 days
 #maxInterval = 345600
-#432000 = 5 dana
+
+#5 da<s
 #maxInterval = 432000
-#518400 = 6 dana
+
+#6 days
 #maxInterval = 518400
-#604800 = 7 dana
+
+#7 days
 #maxInterval = 604800
 
