@@ -175,6 +175,10 @@ if [ $NEWDAY -eq 01 ];  then
   fi
 fi
 
+end_time=`date +%s`
+lasted="$(( $end_time - $start_time ))"
+echo `date +%Y-%m-%d\ %H:%M:%S`" - Backup finished in" $lasted "seconds." >> $LOG
+
 ## delete europe files older than 35 days
 #find $EUROPE -type f -name "*-europe-east.osm.pbf" -mtime +35 -exec rm -f {} \; 
 
