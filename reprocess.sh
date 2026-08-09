@@ -357,12 +357,19 @@ do
   if [[ ! -f $WEB/$COUNTRY/stats/$COUNTRY-daily.txt ]]; then
   echo "Date,Size,Nodes,Ways,Relations" >> $WEB/$COUNTRY/stats/$COUNTRY-daily.txt
   fi
+  ln -s $WEB/$COUNTRY/stats/$COUNTRY-daily.txt $WEB/$COUNTRY/$COUNTRY-daily.txt
+  ln -s $WEB/$COUNTRY/stats/$COUNTRY-daily.txt $WEB/statistics/$COUNTRY-daily.txt
   if [[ ! -f $WEB/$COUNTRY/stats/$COUNTRY-monthly.txt ]]; then
   echo "Date,Size,Nodes,Ways,Relations" >> $WEB/$COUNTRY/stats/$COUNTRY-monthly.txt
   fi
+  ln -s $WEB/$COUNTRY/stats/$COUNTRY-monthly.txt $WEB/$COUNTRY/$COUNTRY-monthly.txt
+  ln -s $WEB/$COUNTRY/stats/$COUNTRY-monthly.txt $WEB/statistics/$COUNTRY-monthly.txt
   if [[ ! -f $WEB/$COUNTRY/stats/$COUNTRY-yearly.txt ]]; then
   echo "Date,Size,Nodes,Ways,Relations" >> $WEB/$COUNTRY/stats/$COUNTRY-yearly.txt
   fi
+  ln -s $WEB/$COUNTRY/stats/$COUNTRY-yearly.txt $WEB/$COUNTRY/$COUNTRY-yearly.txt
+  ln -s $WEB/$COUNTRY/stats/$COUNTRY-yearly.txt $WEB/statistics/$COUNTRY-yearly.txt
+
   TOTAL_SIZE=`wc -c $WEB/$COUNTRY/daily/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf | awk '{print $1}'`
   $OSMCONVERT --out-statistics $WEB/$COUNTRY/daily/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf > $STATS/$COUNTRY-stats.txt
   TOTAL_NODE=`cat $STATS/$COUNTRY-stats.txt | grep nodes | awk -F ' ' '{print $2}'`
@@ -374,9 +381,7 @@ do
   if [ $NEWDAY -eq 01 ]; then
     tail -n 1 $WEB/$COUNTRY/stats/$COUNTRY-daily.txt >> $WEB/$COUNTRY/stats/$COUNTRY-monthly.txt
   fi
-  #next 2lines to be replaced with symlink on server
-  #cp -p $WEB/$COUNTRY/stats/$COUNTRY-total.txt $WEB/$COUNTRY/$COUNTRY-total.txt
-  #cp -p $WEB/$COUNTRY/stats/$COUNTRY-total.txt $WEB/statistics/$COUNTRY-total.txt
+
   echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" csv files created and copied to web." >> $LOG
 
 
