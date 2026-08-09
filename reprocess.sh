@@ -237,41 +237,43 @@ for COUNTRY in albania bosnia-herzegovina bulgaria croatia hungary kosovo northm
 do
 
   if [[ ! -d $WEB/$COUNTRY/daily ]]; then
-    mkdir $WEB/$COUNTRY/daily
+    mkdir -p $WEB/$COUNTRY/daily
     echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" daily folder created" >> $LOG
   fi
 
   if [[ ! -d $WEB/$COUNTRY/monthly ]]; then
-    mkdir $WEB/$COUNTRY/monthly
+    mkdir -p $WEB/$COUNTRY/monthly
     echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" monthly folder created" >> $LOG
   fi
 
-####todo, yearly
+  if [[ ! -d $WEB/$COUNTRY/yearly ]]; then
+    mkdir -p $WEB/$COUNTRY/yearly
+    echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" yearly folder created" >> $LOG
+  fi
 
-#  find $WEB/$COUNTRY/daily/ -type f -name "*.osm.pbf" -mtime +35 -exec rm -f {} \;
-#    if [[ ! -d $WEB/$COUNTRY/monthly/$NEWYEAR/ ]]; then
-#      mkdir $WEB/$COUNTRY/monthly/$NEWYEAR/
-#      echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY $NEWYEAR" folder created" >> $LOG
-#    fi
-#    if [[ ! -f $WEB/$COUNTRY/monthly/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf ]]; then
-  if [ $NEWHOUR -eq 00 ]; then 
-    cp -p $PBF/$COUNTRY.osm.pbf $WEB/$COUNTRY/daily/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf
-    if [ $NEWDAY -eq 01 ]; then
-      cp -p $PBF/$COUNTRY.osm.pbf $WEB/$COUNTRY/monthly/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf
-      echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY $NEWYEAR" monthly export created" >> $LOG
-    #touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $WEB/$COUNTRY/monthly/$NEWYEAR/$NEWYEAR$NEWMONTH$NEWDAY-$COUNTRY.osm.pbf
-
-####todo, yearly, delete daily all but last 30-60 exports???
-
-    fi
-
-  #starting daily exports
+#starting daily exports
   echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" export started" >> $LOG
   start_time=`date +%s`
   $OSMOSIS --read-pbf file="$EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf" --bounding-polygon clipIncompleteEntities="true" file="$POLY/$COUNTRY.poly" --write-pbf file="$DATA/$COUNTRY.osm.pbf"
   touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $DATA/$COUNTRY.osm.pbf
   cp -p $DATA/$COUNTRY.osm.pbf $PBF/$COUNTRY.osm.pbf
-  #ln -s $PBF/$COUNTRY.osm.pbf $WEB/$COUNTRY/$COUNTRY.osm.pbf
+  ln -s $PBF/$COUNTRY.osm.pbf $WEB/$COUNTRY/$COUNTRY.osm.pbf
+  
+  if [ $NEWHOUR -eq 00 ]; then 
+    cp -p $DATA/$COUNTRY.osm.pbf $WEB/$COUNTRY/daily/$NEWYEAR$NEWMONTH$NEWDAY-$COUNTRY.osm.pbf
+    #  find $WEB/$COUNTRY/daily/ -type f -name "*.osm.pbf" -mtime +90 -exec rm -f {} \;
+    echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY $NEWDAY" daily export created" >> $LOG
+      if [ $NEWDAY -eq 01 ]; then
+        cp -p $DATA/$COUNTRY.osm.pbf $WEB/$COUNTRY/monthly/$NEWYEAR$NEWMONTH$NEWDAY-$COUNTRY.osm.pbf
+        echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY $NEWMONTH" monthly export created" >> $LOG
+          if [ $NEWMONTH -eq 01 ] ; then
+            #cp -p $DATA/$COUNTRY.osm.pbf $WEB/$COUNTRY/yearly/$NEWYEAR$NEWMONTH$NEWDAY-$COUNTRY.osm.pbf
+            ln -s $WEB/$COUNTRY/monthly/$NEWYEAR$NEWMONTH$NEWDAY-$COUNTRY.osm.pbf $WEB/$COUNTRY/yearly/$NEWYEAR$NEWMONTH$NEWDAY-$COUNTRY.osm.pbf
+            echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY $NEWYEAR" yearly export created" >> $LOG
+          fi
+      fi
+  fi
+
   end_time=`date +%s`
   lasted="$(( $end_time - $start_time ))"
   echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" PBF export finished in" $lasted "seconds." >> $LOG
@@ -410,6 +412,9 @@ do
   fi
   if [[ ! -f $WEB/$COUNTRY/stats/$COUNTRY-monthly.txt ]]; then
   echo "Date,Size,Nodes,Ways,Relations" >> $WEB/$COUNTRY/stats/$COUNTRY-monthly.txt
+  fi
+  if [[ ! -f $WEB/$COUNTRY/stats/$COUNTRY-yearly.txt ]]; then
+  echo "Date,Size,Nodes,Ways,Relations" >> $WEB/$COUNTRY/stats/$COUNTRY-yearly.txt
   fi
   if [ $NEWDAY -eq 01 ]; then 
     tail -n 1 $WEB/$COUNTRY/stats/$COUNTRY-daily.txt >> $WEB/$COUNTRY/stats/$COUNTRY-monthly.txt
