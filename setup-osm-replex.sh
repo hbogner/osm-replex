@@ -7,6 +7,9 @@
 ##ubuntu 18.04.1 clean install
 #sudo apt-get install zip unzip openjdk-8-jre zlib1g-dev gdal-bin gcc
 
+## debian 12
+#sudo apt-get install zip unzip openjdk-17-jre zlib1g-dev gdal-bin gcc gnuplot
+
 REPLEX=/osm/osm-replex
 
 mkdir $REPLEX/bin
