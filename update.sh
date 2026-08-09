@@ -5,6 +5,8 @@ rm -rf bin/osmosis
 mkdir bin/osmosis
 wget https://github.com/openstreetmap/osmosis/releases/download/0.49.2/osmosis-0.49.2.zip -O bin/osmosis.zip
 unzip bin/osmosis.zip -d bin/osmosis/
+mv bin/osmosis/osmosis-0.49.2/* bin/osmosis/
+rm -rf bin/osmosis/osmosis-0.49.2
 rm bin/osmosis.zip
 
 rm -rf bin/osmandmc
