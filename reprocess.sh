@@ -246,6 +246,8 @@ do
     echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" monthly folder created" >> $LOG
   fi
 
+####todo, yearly
+
 #  find $WEB/$COUNTRY/daily/ -type f -name "*.osm.pbf" -mtime +35 -exec rm -f {} \;
 #    if [[ ! -d $WEB/$COUNTRY/monthly/$NEWYEAR/ ]]; then
 #      mkdir $WEB/$COUNTRY/monthly/$NEWYEAR/
@@ -258,6 +260,9 @@ do
       cp -p $PBF/$COUNTRY.osm.pbf $WEB/$COUNTRY/monthly/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf
       echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY $NEWYEAR" monthly export created" >> $LOG
     #touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $WEB/$COUNTRY/monthly/$NEWYEAR/$NEWYEAR$NEWMONTH$NEWDAY-$COUNTRY.osm.pbf
+
+####todo, yearly, delete daily all but last 30-60 exports???
+
     fi
 
   #starting daily exports
@@ -277,6 +282,7 @@ done
 
 echo `date +%Y-%m-%d\ %H:%M:%S`" - PBF export finished." >> $LOG
 
+####old - remove??
 #
 ##uvjet da se izvršava samo u ponoć
 #if [ $hour -eq 00 ]
@@ -300,7 +306,9 @@ echo `date +%Y-%m-%d\ %H:%M:%S`" - PBF export finished." >> $LOG
 #    done
 #  fi
 #fi
-#
+####old - remove??
+
+
 ######################
 ### gpkg exporti ##
 ######################
@@ -575,13 +583,13 @@ EOF
 
 fi
 
-done
-
-fi
-
 echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" gnuplot done." >> $LOG
 
+done
+
 echo `date +%Y-%m-%d\ %H:%M:%S`" - All statistics finished." >> $LOG
+
+fi
 
 chmod -R 755 $WEB
 
