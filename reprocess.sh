@@ -97,7 +97,7 @@ echo `date +%Y-%m-%d\ %H:%M:%S`" - Exit state:" $EXITSTATUS >> $LOG
 
 if [[ $EXITSTATUS -ne 0 ]] ; then
     echo `date +%Y-%m-%d\ %H:%M:%S`" - Prekidam procesiranje" >> $LOG
-    cp $EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-state.txt $REPLEX/state.txt
+    cp -p $EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-state.txt $REPLEX/state.txt
     exit 1
 fi
 
@@ -118,8 +118,8 @@ echo `date +%Y-%m-%d\ %H:%M:%S`" - Exit state:" $EXITSTATUS >> $LOG
 
 if [[ $EXITSTATUS -ne 0 ]] ; then
     echo `date +%Y-%m-%d\ %H:%M:%S`" - Prekidam procesiranje" >> $LOG
-    cp $EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-state.txt $REPLEX/state.txt
-    cp $EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-europe-east.osm.pbf $EUROPE/europe-east.osm.pbf
+    cp -p $EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-state.txt $REPLEX/state.txt
+    cp -p $EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-europe-east.osm.pbf $EUROPE/europe-east.osm.pbf
     exit 1
 fi
 
@@ -158,8 +158,8 @@ echo `date +%Y-%m-%d\ %H:%M:%S`" - Exit state:" $EXITSTATUS >> $LOG
 
 if [[ $EXITSTATUS -ne 0 ]] ; then
     echo `date +%Y-%m-%d\ %H:%M:%S`" - Prekidam procesiranje" >> $LOG
-    cp $EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-state.txt $REPLEX/state.txt
-    cp $EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-europe-east.osm.pbf $EUROPE/europe-east.osm.pbf
+    cp -p $EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-state.txt $REPLEX/state.txt
+    cp -p $EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-europe-east.osm.pbf $EUROPE/europe-east.osm.pbf
     exit 1
 fi
 
@@ -438,7 +438,7 @@ do
   #country total stats
   #check if statitstics exist and create it if not
   echo $OLDYEAR$OLDMONTH$OLDDAY','$TOTAL_SIZE','$TOTAL_NODE','$TOTAL_WAY','$TOTAL_RELATION >> $WEB/$COUNTRY/stats/$COUNTRY-daily.txt
-  if [ $NEWDAY -eq 01 ]; then 
+  if [ $NEWDAY -eq 01 ]; then
     tail -n 1 $WEB/$COUNTRY/stats/$COUNTRY-daily.txt >> $WEB/$COUNTRY/stats/$COUNTRY-monthly.txt
   fi
   #next 2lines to be replaced with symlink on server
