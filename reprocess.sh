@@ -81,7 +81,7 @@ awk '{if (NR!=1) {print}}' $REPLEX/state.txt >> $LOG
 
 #Downloading changeset and sorting
 echo `date +%Y-%m-%d\ %H:%M:%S`" - Downloading changeset" >> $LOG
-$OSMOSIS --rri workingDirectory=$CHANGESETDIR --sort-change --wxc $CHANGESETDIR/$CHANGESET
+$OSMOSIS --rri workingDirectory=$REPLEX --sort-change --wxc $CHANGESETDIR/$CHANGESET
 EXITSTATUS=$?
 echo `date +%Y-%m-%d\ %H:%M:%S`" - Exit state:" $EXITSTATUS >> $LOG
 
