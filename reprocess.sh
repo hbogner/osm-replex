@@ -50,16 +50,6 @@ LOG=$REPLEX/replex.log
 CHANGESET=changeset-hour.osc.gz
 CHANGESETSIMPLE=changeset-hour-simple.osc.gz
 
-#statistike
-korisnici=$STATS/korisnici.txt
-korisnici_n=$STATS/korisnici_n.txt
-korisnici_wr=$STATS/korisnici_wr.txt
-svikorisnici=$STATS/korisnici_svi.txt
-korpod=$STATS/korisnici_podatci.txt
-korstat1=$STATS/korisnici_statistike_1.txt
-korstat2=$STATS/korisnici_statistike_2.txt
-statistike=$STATS/statistike.htm
-
 
 for i in {1..24}
 do
@@ -164,8 +154,8 @@ if [[ $EXITSTATUS -ne 0 ]] ; then
 fi
 
 #remove changesets
-rm $REPLEX/$CHANGESET
-rm $REPLEX/$CHANGESETSIMPLE
+rm $CHANGESETDIR/$CHANGESET
+rm $CHANGESETDIR/$CHANGESETSIMPLE
 echo `date +%Y-%m-%d\ %H:%M:%S`" - Changesets removed." >> $LOG
 
 end_time=`date +%s`
