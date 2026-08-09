@@ -169,7 +169,7 @@ echo `date +%Y-%m-%d\ %H:%M:%S`" - Changeset applied and cropped in" $lasted "se
 start_time=`date +%s`
 
 #move new europe file over old one and copy it to web
-mv $REPLEX/europe-east.osm.pbf $EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf
+mv $EUROPE/europe-east.osm.pbf $EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf
 touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf
 cp -p $EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf $PBF/europe-east.osm.pbf
 #copy state file to web
@@ -198,37 +198,6 @@ echo `date +%Y-%m-%d\ %H:%M:%S`" - Backup finished in" $lasted "seconds." >> $LO
 
 ## delete europe files older than 35 days
 #find $EUROPE -type f -name "*-europe-east.osm.pbf" -mtime +35 -exec rm -f {} \; 
-
-####################################################
-### dnevni backup europe-east.osm.pbf i state.txt ##
-####################################################
-#
-##only once a day at midnight instance
-#if [ $hour -eq 00 ]
-#  then
-#  #create state.txt dated backup
-#  cp -p $REPLEX/state.txt $EUROPE/$yesterday-state.txt
-#  #create europe file dated backup and copy europe file to data for daily garmin generation
-#  cp -p $EUROPE/europe-east.osm.pbf $EUROPE/$yesterday-europe-east.osm.pbf; cp -p $EUROPE/europe-east.osm.pbf $DATA/europe-east.osm.pbf
-#  echo `date +%Y-%m-%d\ %H:%M:%S`" - Europe and state.txt backup created. Europe copied." >> $LOG
-#
-#  if [ $dayom01 -eq 01 ]
-#   then
-#   #copy europe dated backup to web monthly folder
-#   cp -p $EUROPE/$yesterday-europe-east.osm.pbf $WEB/monthly/$yesterday-europe-east.osm.pbf
-#   echo `date +%Y-%m-%d\ %H:%M:%S`" - Europe monthly archive copied to web." >> $LOG
-#  fi
-#  
-#  #remove old dated europe backups
-#  rm $EUROPE/$olddate-europe-east.osm.pbf
-#fi
-#
-#chmod -R 755 $EUROPE
-#
-#end_time=`date +%s`
-#lasted="$(( $end_time - $start_time ))"
-#echo `date +%Y-%m-%d\ %H:%M:%S`" - Backup finished in" $lasted "seconds." >> $LOG
-
 
 
 #####################
