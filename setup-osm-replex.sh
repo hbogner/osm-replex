@@ -14,6 +14,7 @@ REPLEX=/osm/osm-replex
 
 mkdir $REPLEX/bin
 mkdir $REPLEX/cache
+mkdir $REPLEX/changeset
 mkdir $REPLEX/data
 mkdir $REPLEX/europe
 mkdir $REPLEX/stats
