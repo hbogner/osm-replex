@@ -389,19 +389,6 @@ do
 ## Plot daily stats ##
 ######################
 
-#for TYPE in Nodes Ways Relations
-#do
-#if [ $TYPE -eq Nodes ]
-#then
-#PLOT= $(plot "$WEB/$COUNTRY/stats/$COUNTRY-daily.txt" using 1:2 w l)
-#elif [ $TYPE -eq Ways ]
-#then
-#PLOT= $(plot "$WEB/$COUNTRY/stats/$COUNTRY-daily.txt" using 1:3 w l)
-#else
-#PLOT= $(plot "$WEB/$COUNTRY/stats/$COUNTRY-daily.txt" using 1:4 w l)
-#fi
-#echo $PLOT
-
 gnuplot << EOF
 set datafile separator ","
 set key autotitle columnhead
@@ -469,8 +456,6 @@ set timefmt "%Y%m%d"
 set xtics format "%Y-%m-%d"
 plot "$WEB/$COUNTRY/stats/$COUNTRY-daily.txt" using 1:5 w l
 EOF
-
-#done
 
 ########################
 ## Plot monthly stats ##
