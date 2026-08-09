@@ -22,27 +22,33 @@ DATA=$REPLEX/data
 CACHE=$REPLEX/cache
 POLY=$REPLEX/poly
 STATS=$REPLEX/stats
+
 #www-data folders
 WEB=/osm/www-data
 PBF=$WEB/osm
 FLOODS=$WEB/floods
 GIS=$WEB/gis_exports
+
 #www-tms folders
 TMS=/osm/www-tms
+
 #aplikacije
-osmosis=$REPLEX/bin/osmosis/bin/osmosis
-osmconvert=$REPLEX/bin/osmconvert
-osmfilter=$REPLEX/bin/osmfilter
+OSMOSIS=$REPLEX/bin/osmosis/bin/osmosis
+OSMCONVERT=$REPLEX/bin/osmconvert
+OSMFILTER=$REPLEX/bin/osmfilter
 MKGMAP=$REPLEX/bin/mkgmap/mkgmap.jar
 SPLITTER=$REPLEX/bin/splitter/splitter.jar
 OSMANDMC=$REPLEX/bin/osmandmc
 OGR2OGR=/usr/bin/ogr2ogr
+
 #Ram za java aplikacije
 RAM=5G
+
 #fajlovi
 LOG=$REPLEX/replex.log
 CHANGESET=changeset-hour.osc.gz
 CHANGESETSIMPLE=changeset-hour-simple.osc.gz
+
 #statistike
 korisnici=$STATS/korisnici.txt
 korisnici_n=$STATS/korisnici_n.txt
@@ -84,7 +90,7 @@ awk '{if (NR!=1) {print}}' $REPLEX/state.txt >> $LOG
 
 #Downloading changeset and sorting
 echo `date +%Y-%m-%d\ %H:%M:%S`" - Downloading changeset" >> $LOG
-$osmosis --rri workingDirectory=$REPLEX --sort-change --wxc $REPLEX/$CHANGESET
+$OSMOSIS --rri workingDirectory=$REPLEX --sort-change --wxc $REPLEX/$CHANGESET
 EXITSTATUS=$?
 echo `date +%Y-%m-%d\ %H:%M:%S`" - Exit state:" $EXITSTATUS >> $LOG
 
@@ -105,7 +111,7 @@ echo `date +%Y-%m-%d\ %H:%M:%S`" - Changeset finished in" $lasted "seconds." >> 
 #Simplify changeset
 echo `date +%Y-%m-%d\ %H:%M:%S`" - Simplyfy changeset" >> $LOG
 start_time=`date +%s`
-$osmosis --read-xml-change file="$REPLEX/$CHANGESET" --simplify-change --write-xml-change file="$REPLEX/$CHANGESETSIMPLE"
+$OSMOSIS --read-xml-change file="$REPLEX/$CHANGESET" --simplify-change --write-xml-change file="$REPLEX/$CHANGESETSIMPLE"
 EXITSTATUS=$?
 echo `date +%Y-%m-%d\ %H:%M:%S`" - Exit state:" $EXITSTATUS >> $LOG
 end_time=`date +%s`
@@ -137,7 +143,7 @@ awk '{if (NR!=1) {print}}' $REPLEX/state.txt >> $LOG
 #Primjena changeseta uz rezanje granice
 echo `date +%Y-%m-%d\ %H:%M:%S`" - Apply changeset to europe file" >> $LOG
 start_time=`date +%s`
-$osmosis --read-xml-change file="$REPLEX/$CHANGESETSIMPLE" --read-pbf file="$EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-europe-east.osm.pbf" --apply-change --bounding-polygon clipIncompleteEntities="true" file="$POLY/europe-east.poly" --write-pbf file="$REPLEX/europe-east.osm.pbf"
+$OSMOSIS --read-xml-change file="$REPLEX/$CHANGESETSIMPLE" --read-pbf file="$EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-europe-east.osm.pbf" --apply-change --bounding-polygon clipIncompleteEntities="true" file="$POLY/europe-east.poly" --write-pbf file="$REPLEX/europe-east.osm.pbf"
 EXITSTATUS=$?
 echo `date +%Y-%m-%d\ %H:%M:%S`" - Exit state:" $EXITSTATUS >> $LOG
 
@@ -257,7 +263,7 @@ do
   #starting daily exports
   echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" export started" >> $LOG
   start_time=`date +%s`
-  $osmosis --read-pbf file="$EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf" --bounding-polygon clipIncompleteEntities="true" file="$POLY/$COUNTRY.poly" --write-pbf file="$DATA/$COUNTRY.osm.pbf"
+  $OSMOSIS --read-pbf file="$EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf" --bounding-polygon clipIncompleteEntities="true" file="$POLY/$COUNTRY.poly" --write-pbf file="$DATA/$COUNTRY.osm.pbf"
   touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $DATA/$COUNTRY.osm.pbf
   cp -p $DATA/$COUNTRY.osm.pbf $PBF/$COUNTRY.osm.pbf
   #ln -s $PBF/$COUNTRY.osm.pbf $WEB/$COUNTRY/$COUNTRY.osm.pbf
@@ -280,7 +286,7 @@ echo `date +%Y-%m-%d\ %H:%M:%S`" - PBF export finished." >> $LOG
 #  cp -p $PBF/croatia.osm.pbf $WEB/croatia/monthly/$yesterday-croatia.osm.pbf
 #  echo `date +%Y-%m-%d\ %H:%M:%S`" - Croatia daily monthly created." >> $LOG
 #  ## izvlaci dnevni changeset ######################
-#  $osmosis --read-pbf file="$WEB/croatia/monthly/$daysago-croatia.osm.pbf" --read-pbf file="$WEB/croatia/monthly/$yesterday-croatia.osm.pbf" --derive-change --write-xml-change compressionMethod=gzip file="$WEB/croatia/monthly/$daysago-$yesterday-croatia.osc.gz"
+#  $OSMOSIS --read-pbf file="$WEB/croatia/monthly/$daysago-croatia.osm.pbf" --read-pbf file="$WEB/croatia/monthly/$yesterday-croatia.osm.pbf" --derive-change --write-xml-change compressionMethod=gzip file="$WEB/croatia/monthly/$daysago-$yesterday-croatia.osc.gz"
 #  end_time=`date +%s`
 #  lasted="$(( $end_time - $start_time ))"
 #  echo `date +%Y-%m-%d\ %H:%M:%S`" - Croatia diff finished in" $lasted "seconds." >> $LOG
@@ -401,7 +407,7 @@ do
     tail -n 1 $WEB/$COUNTRY/stats/$COUNTRY-daily.txt >> $WEB/$COUNTRY/stats/$COUNTRY-monthly.txt
   fi
   TOTAL_SIZE=`wc -c $WEB/$COUNTRY/daily/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf | awk '{print $1}'`
-  $osmconvert --out-statistics $WEB/$COUNTRY/daily/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf > $STATS/$COUNTRY-stats.txt
+  $OSMCONVERT --out-statistics $WEB/$COUNTRY/daily/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf > $STATS/$COUNTRY-stats.txt
   TOTAL_NODE=`cat $STATS/$COUNTRY-stats.txt | grep nodes | awk -F ' ' '{print $2}'`
   TOTAL_WAY=`cat $STATS/$COUNTRY-stats.txt | grep ways | awk -F ' ' '{print $2}'`
   TOTAL_RELATION=`cat $STATS/$COUNTRY-stats.txt | grep relations | awk -F ' ' '{print $2}'`
