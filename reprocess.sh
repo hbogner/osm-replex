@@ -42,7 +42,7 @@ OSMANDMC=$REPLEX/bin/osmandmc
 OGR2OGR=/usr/bin/ogr2ogr
 
 #Ram za java aplikacije
-RAM=5G
+RAM=16G
 
 #fajlovi
 LOG=$REPLEX/replex.log
