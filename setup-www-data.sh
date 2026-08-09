@@ -20,7 +20,9 @@ for COUNTRY in albania bosnia-herzegovina bulgaria croatia hungary kosovo northm
 do
 
 	mkdir $WEB/$COUNTRY
-	mkdir $WEB/$COUNTRY/archive
+	mkdir $WEB/$COUNTRY/daily
+	mkdir $WEB/$COUNTRY/monthly
+	mkdir $WEB/$COUNTRY/yearly
 	mkdir $WEB/$COUNTRY/stats
 
 done
