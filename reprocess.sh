@@ -257,32 +257,6 @@ done
 
 echo `date +%Y-%m-%d\ %H:%M:%S`" - PBF export finished." >> $LOG
 
-####old - remove??
-#
-##uvjet da se izvršava samo u ponoć
-#if [ $hour -eq 00 ]
-#  start_time=`date +%s`
-#  then
-#  ##kopira croatia sa datumom ######################
-#  cp -p $PBF/croatia.osm.pbf $WEB/croatia/monthly/$yesterday-croatia.osm.pbf
-#  echo `date +%Y-%m-%d\ %H:%M:%S`" - Croatia daily monthly created." >> $LOG
-#  ## izvlaci dnevni changeset ######################
-#  $OSMOSIS --read-pbf file="$WEB/croatia/monthly/$daysago-croatia.osm.pbf" --read-pbf file="$WEB/croatia/monthly/$yesterday-croatia.osm.pbf" --derive-change --write-xml-change compressionMethod=gzip file="$WEB/croatia/monthly/$daysago-$yesterday-croatia.osc.gz"
-#  end_time=`date +%s`
-#  lasted="$(( $end_time - $start_time ))"
-#  echo `date +%Y-%m-%d\ %H:%M:%S`" - Croatia diff finished in" $lasted "seconds." >> $LOG
-#  if [ $dayom01 -eq 01 ]
-#   then
-#   for COUNTRY in albania bosnia-herzegovina bulgaria hungary kosovo northmacedonia montenegro romania serbia slovenia
-#    do
-#      #copy COUNTRY monthly backup
-#      cp -p $PBF/$COUNTRY.osm.pbf $WEB/$COUNTRY/monthly/$yesterday-$COUNTRY.osm.pbf
-#      echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" monthly monthly created." >> $LOG
-#    done
-#  fi
-#fi
-####old - remove??
-
 
 ######################
 ### gpkg exporti ##
