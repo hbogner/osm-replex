@@ -7,6 +7,9 @@ bin/
 #cache files
 cache/
 
+#changeset files
+changeset/
+
 #data files
 data/
 
