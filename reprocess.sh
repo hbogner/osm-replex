@@ -241,17 +241,19 @@ do
       fi
   fi
 
-  #starting daily exports
-  echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" export started" >> $LOG
-  start_time=`date +%s`
-  $OSMOSIS --read-pbf file="$EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf" --bounding-polygon clipIncompleteEntities="true" file="$POLY/$COUNTRY.poly" --write-pbf omitmetadata="true" file="$DATA/$COUNTRY.osm.pbf"
-  touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $DATA/$COUNTRY.osm.pbf
-  cp -p $DATA/$COUNTRY.osm.pbf $PBF/$COUNTRY.osm.pbf
-  ln -s $PBF/$COUNTRY.osm.pbf $WEB/$COUNTRY/$COUNTRY.osm.pbf
-
-  end_time=`date +%s`
-  lasted="$(( $end_time - $start_time ))"
-  echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" PBF export finished in" $lasted "seconds." >> $LOG
+  if [ $NEWHOUR -eq 23 ]; then 
+    #starting daily exports
+    echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" export started" >> $LOG
+    start_time=`date +%s`
+    $OSMOSIS --read-pbf file="$EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf" --bounding-polygon clipIncompleteEntities="true" file="$POLY/$COUNTRY.poly" --write-pbf omitmetadata="true" file="$DATA/$COUNTRY.osm.pbf"
+    touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $DATA/$COUNTRY.osm.pbf
+    cp -p $DATA/$COUNTRY.osm.pbf $PBF/$COUNTRY.osm.pbf
+    ln -s $PBF/$COUNTRY.osm.pbf $WEB/$COUNTRY/$COUNTRY.osm.pbf
+  
+    end_time=`date +%s`
+    lasted="$(( $end_time - $start_time ))"
+    echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" PBF export finished in" $lasted "seconds." >> $LOG
+  fi
 
 done
 
