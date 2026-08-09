@@ -18,6 +18,7 @@ dayom01=$(date +%d)
 #replex folders
 REPLEX=/osm/osm-replex
 EUROPE=$REPLEX/europe
+CHANGESETDIR=$REPLEX/changeset
 DATA=$REPLEX/data
 CACHE=$REPLEX/cache
 POLY=$REPLEX/poly
@@ -90,7 +91,7 @@ awk '{if (NR!=1) {print}}' $REPLEX/state.txt >> $LOG
 
 #Downloading changeset and sorting
 echo `date +%Y-%m-%d\ %H:%M:%S`" - Downloading changeset" >> $LOG
-$OSMOSIS --rri workingDirectory=$REPLEX --sort-change --wxc $REPLEX/$CHANGESET
+$OSMOSIS --rri workingDirectory=$CHANGESETDIR --sort-change --wxc $CHANGESETDIR/$CHANGESET
 EXITSTATUS=$?
 echo `date +%Y-%m-%d\ %H:%M:%S`" - Exit state:" $EXITSTATUS >> $LOG
 
@@ -111,9 +112,17 @@ echo `date +%Y-%m-%d\ %H:%M:%S`" - Changeset finished in" $lasted "seconds." >> 
 #Simplify changeset
 echo `date +%Y-%m-%d\ %H:%M:%S`" - Simplyfy changeset" >> $LOG
 start_time=`date +%s`
-$OSMOSIS --read-xml-change file="$REPLEX/$CHANGESET" --simplify-change --write-xml-change file="$REPLEX/$CHANGESETSIMPLE"
+$OSMOSIS --read-xml-change file="$CHANGESETDIR/$CHANGESET" --simplify-change --write-xml-change file="$CHANGESETDIR/$CHANGESETSIMPLE"
 EXITSTATUS=$?
 echo `date +%Y-%m-%d\ %H:%M:%S`" - Exit state:" $EXITSTATUS >> $LOG
+
+if [[ $EXITSTATUS -ne 0 ]] ; then
+    echo `date +%Y-%m-%d\ %H:%M:%S`" - Prekidam procesiranje" >> $LOG
+    cp $EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-state.txt $REPLEX/state.txt
+    cp $EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-europe-east.osm.pbf $EUROPE/europe-east.osm.pbf
+    exit 1
+fi
+
 end_time=`date +%s`
 lasted="$(( $end_time - $start_time ))"
 echo `date +%Y-%m-%d\ %H:%M:%S`" - Changeset simplified in" $lasted "seconds." >> $LOG
@@ -143,9 +152,16 @@ awk '{if (NR!=1) {print}}' $REPLEX/state.txt >> $LOG
 #Primjena changeseta uz rezanje granice
 echo `date +%Y-%m-%d\ %H:%M:%S`" - Apply changeset to europe file" >> $LOG
 start_time=`date +%s`
-$OSMOSIS --read-xml-change file="$REPLEX/$CHANGESETSIMPLE" --read-pbf file="$EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-europe-east.osm.pbf" --apply-change --bounding-polygon clipIncompleteEntities="true" file="$POLY/europe-east.poly" --write-pbf file="$REPLEX/europe-east.osm.pbf"
+$OSMOSIS --read-xml-change file="$CHANGESETDIR/$CHANGESETSIMPLE" --read-pbf file="$EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-europe-east.osm.pbf" --apply-change --bounding-polygon clipIncompleteEntities="true" file="$POLY/europe-east.poly" --write-pbf omitmetadata="true" file="$EUROPE/europe-east.osm.pbf"
 EXITSTATUS=$?
 echo `date +%Y-%m-%d\ %H:%M:%S`" - Exit state:" $EXITSTATUS >> $LOG
+
+if [[ $EXITSTATUS -ne 0 ]] ; then
+    echo `date +%Y-%m-%d\ %H:%M:%S`" - Prekidam procesiranje" >> $LOG
+    cp $EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-state.txt $REPLEX/state.txt
+    cp $EUROPE/$OLDYEAR$OLDMONTH$OLDDAY-europe-east.osm.pbf $EUROPE/europe-east.osm.pbf
+    exit 1
+fi
 
 #remove changesets
 rm $REPLEX/$CHANGESET
@@ -251,34 +267,32 @@ do
     echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" yearly folder created" >> $LOG
   fi
 
-#starting daily exports
-  echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" export started" >> $LOG
-  start_time=`date +%s`
-  $OSMOSIS --read-pbf file="$EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf" --bounding-polygon clipIncompleteEntities="true" file="$POLY/$COUNTRY.poly" --write-pbf file="$DATA/$COUNTRY.osm.pbf"
-  touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $DATA/$COUNTRY.osm.pbf
-  cp -p $DATA/$COUNTRY.osm.pbf $PBF/$COUNTRY.osm.pbf
-  ln -s $PBF/$COUNTRY.osm.pbf $WEB/$COUNTRY/$COUNTRY.osm.pbf
-  
   if [ $NEWHOUR -eq 00 ]; then 
-    cp -p $DATA/$COUNTRY.osm.pbf $WEB/$COUNTRY/daily/$NEWYEAR$NEWMONTH$NEWDAY-$COUNTRY.osm.pbf
+    cp -p $DATA/$COUNTRY.osm.pbf $WEB/$COUNTRY/daily/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf
     #  find $WEB/$COUNTRY/daily/ -type f -name "*.osm.pbf" -mtime +90 -exec rm -f {} \;
     echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY $NEWDAY" daily export created" >> $LOG
       if [ $NEWDAY -eq 01 ]; then
-        cp -p $DATA/$COUNTRY.osm.pbf $WEB/$COUNTRY/monthly/$NEWYEAR$NEWMONTH$NEWDAY-$COUNTRY.osm.pbf
+        cp -p $WEB/$COUNTRY/daily/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf $WEB/$COUNTRY/monthly/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf
         echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY $NEWMONTH" monthly export created" >> $LOG
           if [ $NEWMONTH -eq 01 ] ; then
             #cp -p $DATA/$COUNTRY.osm.pbf $WEB/$COUNTRY/yearly/$NEWYEAR$NEWMONTH$NEWDAY-$COUNTRY.osm.pbf
-            ln -s $WEB/$COUNTRY/monthly/$NEWYEAR$NEWMONTH$NEWDAY-$COUNTRY.osm.pbf $WEB/$COUNTRY/yearly/$NEWYEAR$NEWMONTH$NEWDAY-$COUNTRY.osm.pbf
+            ln -s $WEB/$COUNTRY/monthly/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf $WEB/$COUNTRY/yearly/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf
             echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY $NEWYEAR" yearly export created" >> $LOG
           fi
       fi
   fi
 
+  #starting daily exports
+  echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" export started" >> $LOG
+  start_time=`date +%s`
+  $OSMOSIS --read-pbf file="$EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf" --bounding-polygon clipIncompleteEntities="true" file="$POLY/$COUNTRY.poly" --write-pbf omitmetadata="true" file="$DATA/$COUNTRY.osm.pbf"
+  touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $DATA/$COUNTRY.osm.pbf
+  cp -p $DATA/$COUNTRY.osm.pbf $PBF/$COUNTRY.osm.pbf
+  ln -s $PBF/$COUNTRY.osm.pbf $WEB/$COUNTRY/$COUNTRY.osm.pbf
+
   end_time=`date +%s`
   lasted="$(( $end_time - $start_time ))"
   echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" PBF export finished in" $lasted "seconds." >> $LOG
-
-  fi
 
 done
 
@@ -416,9 +430,6 @@ do
   if [[ ! -f $WEB/$COUNTRY/stats/$COUNTRY-yearly.txt ]]; then
   echo "Date,Size,Nodes,Ways,Relations" >> $WEB/$COUNTRY/stats/$COUNTRY-yearly.txt
   fi
-  if [ $NEWDAY -eq 01 ]; then 
-    tail -n 1 $WEB/$COUNTRY/stats/$COUNTRY-daily.txt >> $WEB/$COUNTRY/stats/$COUNTRY-monthly.txt
-  fi
   TOTAL_SIZE=`wc -c $WEB/$COUNTRY/daily/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf | awk '{print $1}'`
   $OSMCONVERT --out-statistics $WEB/$COUNTRY/daily/$OLDYEAR$OLDMONTH$OLDDAY-$COUNTRY.osm.pbf > $STATS/$COUNTRY-stats.txt
   TOTAL_NODE=`cat $STATS/$COUNTRY-stats.txt | grep nodes | awk -F ' ' '{print $2}'`
@@ -427,6 +438,9 @@ do
   #country total stats
   #check if statitstics exist and create it if not
   echo $OLDYEAR$OLDMONTH$OLDDAY','$TOTAL_SIZE','$TOTAL_NODE','$TOTAL_WAY','$TOTAL_RELATION >> $WEB/$COUNTRY/stats/$COUNTRY-daily.txt
+  if [ $NEWDAY -eq 01 ]; then 
+    tail -n 1 $WEB/$COUNTRY/stats/$COUNTRY-daily.txt >> $WEB/$COUNTRY/stats/$COUNTRY-monthly.txt
+  fi
   #next 2lines to be replaced with symlink on server
   #cp -p $WEB/$COUNTRY/stats/$COUNTRY-total.txt $WEB/$COUNTRY/$COUNTRY-total.txt
   #cp -p $WEB/$COUNTRY/stats/$COUNTRY-total.txt $WEB/statistics/$COUNTRY-total.txt
