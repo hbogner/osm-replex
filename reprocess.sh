@@ -362,15 +362,15 @@ do
   fi
   ln -s $WEB/$COUNTRY/stats/$COUNTRY-daily.txt $WEB/$COUNTRY/$COUNTRY-daily.txt
   ln -s $WEB/$COUNTRY/stats/$COUNTRY-daily.txt $WEB/statistics/$COUNTRY-daily.txt
-  ln -s $WEB/$COUNTRY/stats/$COUNTRY-daily.png $WEB/$COUNTRY/$COUNTRY-daily.png
-  ln -s $WEB/$COUNTRY/stats/$COUNTRY-daily.png $WEB/statistics/$COUNTRY-daily.png
+  #ln -s $WEB/$COUNTRY/stats/$COUNTRY-daily.png $WEB/$COUNTRY/$COUNTRY-daily.png
+  #ln -s $WEB/$COUNTRY/stats/$COUNTRY-daily.png $WEB/statistics/$COUNTRY-daily.png
   if [[ ! -f $WEB/$COUNTRY/stats/$COUNTRY-monthly.txt ]]; then
   echo "Date,Size,Nodes,Ways,Relations" >> $WEB/$COUNTRY/stats/$COUNTRY-monthly.txt
   fi
   ln -s $WEB/$COUNTRY/stats/$COUNTRY-monthly.txt $WEB/$COUNTRY/$COUNTRY-monthly.txt
   ln -s $WEB/$COUNTRY/stats/$COUNTRY-monthly.txt $WEB/statistics/$COUNTRY-monthly.txt
-  ln -s $WEB/$COUNTRY/stats/$COUNTRY-monthly.png $WEB/$COUNTRY/$COUNTRY-monthly.png
-  ln -s $WEB/$COUNTRY/stats/$COUNTRY-monthly.png $WEB/statistics/$COUNTRY-monthly.png
+  #ln -s $WEB/$COUNTRY/stats/$COUNTRY-monthly.png $WEB/$COUNTRY/$COUNTRY-monthly.png
+  #ln -s $WEB/$COUNTRY/stats/$COUNTRY-monthly.png $WEB/statistics/$COUNTRY-monthly.png
   if [[ ! -f $WEB/$COUNTRY/stats/$COUNTRY-yearly.txt ]]; then
   echo "Date,Size,Nodes,Ways,Relations" >> $WEB/$COUNTRY/stats/$COUNTRY-yearly.txt
   fi
