@@ -245,7 +245,8 @@ do
     #starting daily exports
     echo `date +%Y-%m-%d\ %H:%M:%S`" - "$COUNTRY" export started" >> $LOG
     start_time=`date +%s`
-    $OSMOSIS --read-pbf file="$EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf" --bounding-polygon clipIncompleteEntities="true" file="$POLY/$COUNTRY.poly" --write-pbf omitmetadata="true" file="$DATA/$COUNTRY.osm.pbf"
+    #$OSMOSIS --read-pbf file="$EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf" --bounding-polygon clipIncompleteEntities="true" file="$POLY/$COUNTRY.poly" --write-pbf omitmetadata="true" file="$DATA/$COUNTRY.osm.pbf"
+    $OSMCONVERT --hash-memory=3500 $EUROPE/$NEWYEAR$NEWMONTH$NEWDAY-europe-east.osm.pbf -B=$POLY/$COUNTRY.poly --complete-ways --complete-multipolygons --complete-boundaries --drop-version -o=$DATA/$COUNTRY.osm.pbf
     touch -a -m -t $NEWYEAR$NEWMONTH$NEWDAY$NEWHOUR$NEWMINUTE.$NEWSECOND $DATA/$COUNTRY.osm.pbf
     cp -p $DATA/$COUNTRY.osm.pbf $WEB/$COUNTRY/$COUNTRY.osm.pbf
     ln -s $WEB/$COUNTRY/$COUNTRY.osm.pbf $PBF/$COUNTRY.osm.pbf
